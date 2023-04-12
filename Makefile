@@ -24,3 +24,6 @@ install:
 	${INSTALL} -d -m 0775 ${DESTDIR}
 	${INSTALL} -d -m 0775 ${MAN1_DIR}
 	${INSTALL} -m 0755 ${TARGETS} ${DESTDIR}
+
+shellcheck: sgit
+	@${SHELLCHECK} sgit
