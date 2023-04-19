@@ -56,6 +56,14 @@ needs to be:
 ## With tracing enabled, change references of `\<sed\>` to `used` in this file and save it:
 
 ```sh
+./sgit -e 's/\<sed\>/used/g' -x README.md
+
+```
+
+
+## With tracing enabled, change references of `\<sed\>` to `used`, duplicating the lines, in this file and save it:
+
+```sh
 ./sgit -e 's/\<sed\>/used/p' -x README.md
 
 ```
@@ -63,26 +71,25 @@ needs to be:
 ## Verbosely (level 1) change references of `\<sed\>` to `used` in this file and save it:
 
 ```sh
-./sgit -e 's/\<sed\>/used/p' -v1 README.md
+./sgit -e 's/\<sed\>/used/g' -v1 README.md
 
 ```
 
 ## Verbosely (level 3) change references of `\<sed\>` to `used` in this file with a backup as `README.md.bak`
 
 ```sh
-./sgit -i.bak -e 's/\<sed\>/used/p' -v3 README.md
+./sgit -i.bak -e 's/\<sed\>/used/g' -v3 README.md
 
 ```
 
 With that you would see something like:
 
 ```sh
-./sgit -i.bak -e 's/\<sed\>/used/p' -v3 README.md
-debug[2]: sed commands:  -e	s/\<sed\>/used/p
+debug[2]: sed commands:  -e	s/\<sed\>/used/g
 debug[2]: looping through all globs
 debug[1]: using backup extension: .bak
 debug[2]: found glob: 0
-debug[1]: about to run: git ls-files README.md | xargs /opt/local/bin/sed -i".bak" -e	s/\<sed\>/used/p
+debug[1]: about to run: git ls-files README.md | xargs /opt/local/bin/sed -i".bak" -e	s/\<sed\>/used/g
 debug[2]: 0 remaining globs
 ```
 
