@@ -28,7 +28,9 @@ USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o
     -v level		    set verbosity level
     -x			    turn on tracing (set -x)
     -I			    disable in place editing
-    -n extension	    set backup extension (default none)
+    -i extension	    set backup extension (default none)
+				WARNING: sed -i overwrites existing files
+				WARNING: this will create another file for each file changed
     -o			    sed options (NOTE: don't pass '-'!)
 				WARNING: use of '-o n' without '-I', can depending on command, empty files
     -s sed		    set path to sed

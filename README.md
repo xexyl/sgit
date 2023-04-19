@@ -21,7 +21,9 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_options] [-s s
     -v level		    set verbosity level
     -x			    turn on tracing (set -x)
     -I			    disable in place editing
-    -n extension	    set backup extension (default none)
+    -i extension	    set backup extension (default none)
+				WARNING: sed -i overwrites existing files
+				WARNING: this will create another file for each file changed
     -o			    sed options (NOTE: don't pass '-'!)
 				WARNING: use of '-o n' without '-I', can depending on command, empty files
     -s sed		    set path to sed
@@ -33,6 +35,39 @@ sgit version: 0.0.8-1 19-04-2023
 You **MUST** specify at least one `sed` command and one glob: the sed command by
 way of the `-e` option (just like with `sed`); anything after the last option is
 a glob. You may specify more than one of each. Specify `-e` for each command.
+
+# A note about the `-i` option and backup extensions
+
+It works like `sed -i` except that the default behaviour of the script is to use
+`-i` just with an empty backup extension (this is required for some versions of
+`sed` which force that a backup extension actually be provided with the `-i`
+option .. I'm looking at you, BSD/macOS `sed`).
+
+
+# `-i` WARNING: each file edited will result in another file in the working directory
+
+Of course if you have 50 files that are affected then 50 new files will be
+created.
+
+# `-i` WARNING: `sed -i` **WILL OVERWRITE EXISTING FILES**!
+
+Please be aware that if a backup file already exists it **WILL** be overwritten!
+I won't even try and detect this because it's not how `sed` works and it would
+overly complicate the script.
+
+
+# `-o n` WARNING: invalid use of -o n can empty files!
+
+Because `sed -n` does not print output if you do not use `-I` and you use
+substitute you can empty the entire file. For instance **DO NOT** do this:
+
+
+```sh
+./sgit -o n -e 's/.//g' sgit
+```
+
+because it would empty `sgit`!
+
 
 # Examples
 
@@ -95,12 +130,6 @@ debug[2]: 0 remaining globs
 
 Level 2 would not show how many globs remain after each operation.
 
-### WARNING: each file edited will result in another file in the working directory
-
-Of course if you have 50 files that are affected then 50 new files will be
-created. I don't know what `sed` will do if the backup file already exists but
-it's possible that it'll overwrite it.
-
 
 ## Change `\<sed\>` to `used` but only if it's on the first line
 
@@ -122,18 +151,6 @@ Alternatively you could do one of:
 ./sgit -e '3s/\<hack\>/crack/g' README.md
 ```
 
-
-# WARNING: invalid use of -o -n can empty files!
-
-Because `sed -n` does not print output if you do not use `-I` and you use
-substitute you can empty the entire file. For instance **DO NOT** do this:
-
-
-```sh
-./sgit -o n -e 's/.//g' sgit
-```
-
-because it would empty `sgit`!
 
 
 ## Installation
