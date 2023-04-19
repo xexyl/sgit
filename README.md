@@ -88,19 +88,33 @@ debug[2]: 0 remaining globs
 
 Level 2 would not show how many globs remain after each operation.
 
-## Change `\<sed\>` to `used` but only if it's on the third line
+### WARNING: each file edited will result in another file in the working directory
+
+Of course if you have 50 files that are affected then 50 new files will be
+created. I don't know what `sed` will do if the backup file already exists but
+it's possible that it'll overwrite it.
+
+
+## Change `\<sed\>` to `used` but only if it's on the first line
 
 ```sh
-./sgit -e '3s/\<sed\>/used/g' README.md
+./sgit -e '1s/\<sed\>/used/g' README.md
 ```
 
 Alternatively you could do one of:
 
 
 ```sh
-./sgit -e '3s/\<sed\>/u&/g' README.md
-./sgit -e '3s/\(\<sed\>\)/u\1/g' README.md
+./sgit -e '1s/\<sed\>/u&/g' README.md
+./sgit -e '1s/\(\<sed\>\)/u\1/g' README.md
 ```
+
+## Change `\<hack\>` to `crack` but only if it's on the third line
+
+```sh
+./sgit -e '3s/\<hack\>/crack/g' README.md
+```
+
 
 # WARNING: invalid use of -o -n can empty files!
 
