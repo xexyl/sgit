@@ -3,6 +3,7 @@
 #############
 # utilities #
 #############
+CHECKNR= checknr
 INSTALL= install
 MAKE= make
 SHELL= bash
@@ -15,6 +16,7 @@ DESTDIR= /usr/local/bin
 MAN1_DIR= /usr/local/share/man/man1
 TARGETS= sgit
 MAN1_TARGETS= sgit.1
+ALL_MAN_TARGETS= ${MAN1_TARGETS}
 
 all:
 	@:
@@ -29,3 +31,17 @@ install:
 
 shellcheck: sgit
 	@${SHELLCHECK} sgit
+
+check_man:
+	@if ! type -P ${CHECKNR} >/dev/null 2>&1; then \
+            echo 'The ${CHECKNR} command could not be found.' 1>&2; \
+            echo 'The ${CHECKNR} command is required to run the $@ rule.' 1>&2; \
+            echo ''; 1>&2; \
+            echo 'See the following GitHub repo for ${CHECKNR}:'; 1>&2; \
+            echo ''; 1>&2; \
+            echo '    https://github.com/lcn2/checknr' 1>&2; \
+            echo ''; 1>&2; \
+            echo 'Or use the package manager in your OS to install it.' 1>&2; \
+        else \
+            ${CHECKNR} -c.BR.SS.BI.IR.RB.RI ${ALL_MAN_TARGETS}; \
+	fi
