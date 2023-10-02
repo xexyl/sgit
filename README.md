@@ -305,6 +305,9 @@ this will probably generally not be needed.
 ## Dedications
 
 This is dedicated to the [IOCCC](https://www.ioccc.org), the [IOCCC
-judges](https://www.ioccc.org/judges.html) (especially [Landon Curt
-Noll](http://www.isthe.com/chongo/) and above all my dear Mum Dianne and my
-wonderful cousin Dani.
+judges](https://www.ioccc.org/judges.html) especially ([Landon Curt
+Noll](http://www.isthe.com/chongo/)) for the friendship, telling me stories and
+jokes, telling me history of different things about Unix, C and other things and
+giving me the wonderful opportunity to help so much with the IOCCC - prompting
+me to write this tool - and above all my dear Mum Dianne and my wonderful cousin
+Dani.
