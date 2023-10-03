@@ -115,8 +115,15 @@ Set verbosity level.
 .B \-x
 Turn on tracing (set \-x)
 .TP
-.B -I
-Disable in place editing
+.B \-I
+Disable in place editing.
+.RS
+.PP
+Note that
+.B \-n
+implies
+.BR \-I .
+.RE
 .TP
 .BI \-i\  extension
 Set backup extension (default none)
@@ -159,7 +166,7 @@ Set path to
 .BI \-e\  command
 Append
 .BR sed (1)
-command to commands list.
+command to commands list to execute on globs.
 .TP
 .B \-n
 Enable dry-mode.
@@ -170,8 +177,13 @@ commands would have been run on each file if the
 option was not used; otherwise it will only show the files that would have been touched if the
 .B \-n
 option was not used.
-.BR sed (1)
-command to list of commands to execute on globs
+.RS
+.PP
+Note that
+.B \-n
+implies
+.BR \-I .
+.RE
 .SH EXIT STATUS
 .TP
 0
