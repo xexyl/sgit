@@ -1,4 +1,10 @@
 
+# Version 0.0.16-1 03-10-2023
+
+It is not strictly correct to say that use of `-n` implies `-I` but rather that
+the use of `-n` means `sed(1)` will not be used at all. This has been clarified
+in the man page, the README.md and the script itself.
+
 # Version 0.0.15-1 03-10-2023
 
 Fix a case of `-n` with `-v` greater than or equal to 1 where the files were not

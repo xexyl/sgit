@@ -33,7 +33,7 @@
 # - Cody Boone Ferguson (@xexyl)
 #
 
-export SGIT_VERSION="0.0.15-1 03-10-2023" # format: major.minor.patch-release DD-MM-YYYY
+export SGIT_VERSION="0.0.16-1 03-10-2023" # format: major.minor.patch-release DD-MM-YYYY
 
 USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s sed] [-e command] [-n] <glob...>
 
@@ -42,8 +42,6 @@ USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o
     -v level		    set verbosity level
     -x			    turn on tracing (set -x)
     -I			    disable in place editing
-
-				NOTE: -n implies -I
 
     -i extension	    set backup extension (default none)
 				WARNING: sed -i overwrites existing backup files
@@ -60,12 +58,13 @@ USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o
     -s sed		    set path to sed
     -e command		    append sed command to list of commands to execute on globs
 
+
     -n			    dry-run: only show files that would be modified but do not touch them
 
 				NOTE: depending on verbosity level, only the files considered will
 				be printed or the sed commands along with the files will be printed
+				NOTE: use of -n prevents sed commands from being run
 
-				NOTE: -n implies -I
 
 sgit version: $SGIT_VERSION"
 

@@ -117,13 +117,6 @@ Turn on tracing (set \-x)
 .TP
 .B \-I
 Disable in place editing.
-.RS
-.PP
-Note that
-.B \-n
-implies
-.BR \-I .
-.RE
 .TP
 .BI \-i\  extension
 Set backup extension (default none)
@@ -179,10 +172,11 @@ option was not used; otherwise it will only show the files that would have been 
 option was not used.
 .RS
 .PP
-Note that
+Note that use of
 .B \-n
-implies
-.BR \-I .
+prevents
+.BR sed (1)
+commands from being run.
 .RE
 .SH EXIT STATUS
 .TP
