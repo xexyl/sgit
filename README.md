@@ -58,6 +58,8 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s se
     -x			    turn on tracing (set -x)
     -I			    disable in place editing
 
+				NOTE: -n implies -I
+
     -i extension	    set backup extension (default none)
 				WARNING: sed -i overwrites existing backup files
 				WARNING: this will create or update a file for each file changed
@@ -77,6 +79,8 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s se
 
 				NOTE: depending on verbosity level, only the files considered will
 				be printed or the sed commands along with the files will be printed
+
+				NOTE: -n implies -I
 
 sgit version: 0.0.15-1 03-10-2023
 ```
