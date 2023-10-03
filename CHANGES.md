@@ -1,4 +1,13 @@
-# Version 0.0.13-2 03-10-2023
+
+# Version 0.0.15-1 03-10-2023
+
+Fix a case of `-n` with `-v` greater than or equal to 1 where the files were not
+printed along with the `sed` command.
+
+Added examples to README.md file.
+
+
+# Version 0.0.14-1 03-10-2023
 
 Add support of `-n` option. Depending on the verbosity this option will print
 the files that WOULD BE considered if `-n` was not specified OR otherwise show

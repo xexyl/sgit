@@ -33,7 +33,7 @@
 # - Cody Boone Ferguson (@xexyl)
 #
 
-export SGIT_VERSION="0.0.14-1 03-10-2023" # format: major.minor.patch-release DD-MM-YYYY
+export SGIT_VERSION="0.0.15-1 03-10-2023" # format: major.minor.patch-release DD-MM-YYYY
 
 USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s sed] [-e command] [-n] <glob...>
 
@@ -57,8 +57,9 @@ USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o
 
     -s sed		    set path to sed
     -e command		    append sed command to list of commands to execute on globs
+
     -n			    dry-run: only show files that would be modified but do not touch them
-				
+
 				NOTE: depending on verbosity level, only the files considered will
 				be printed or the sed commands along with the files will be printed
 
@@ -220,7 +221,7 @@ while [[ "$i" -lt "$GLOBS" ]]; do
 	else
 	    for f in $(git ls-files "$1"); do
 		if [[ "$VERBOSITY" -ge 1 ]]; then
-		    echo "$SED" -i"$EXTENSION" "${SED_COMMANDS[@]}" 1>&2
+		    echo "$SED" -i"$EXTENSION" "${SED_COMMANDS[@]}" "$f" 1>&2
 		else
 		    echo "$f" 1>&2
 		fi

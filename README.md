@@ -72,12 +72,13 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s se
 
     -s sed		    set path to sed
     -e command		    append sed command to list of commands to execute on globs
+
     -n			    dry-run: only show files that would be modified but do not touch them
 
 				NOTE: depending on verbosity level, only the files considered will
 				be printed or the sed commands along with the files will be printed
 
-sgit version: 0.0.14-1 03-10-2023
+sgit version: 0.0.15-1 03-10-2023
 ```
 
 You **MUST** specify at least one `sed` command and one glob: the `sed` command
@@ -244,6 +245,101 @@ sgit -e '1s/\(\<sed\>\)/u\1/g' README.md
 sgit -e '3s/\<sgit\>/gits/g' README.md
 ```
 
+### Dry-run mode: _ONLY SHOW_ files that would be modified rather than modify them
+
+If you want to _ONLY SEE FILES_ that would be considered _WITHOUT_ touching them you
+can use the `-n` option like so:
+
+```sh
+sgit -n -e '' .
+```
+
+This would print every file in the repository from the current working
+directory. Since nothing will be done anyway it would not matter if the sed
+command list is empty. Typically if the sed command list is empty it just won't
+do anything but in this case it would not change any behaviour of sed as sed
+won't be run. For instance the above command would show in this repository at
+this time (03 Oct 2023):
+
+```sh
+.gitignore
+CHANGES.md
+Makefile
+README.md
+sgit
+sgit.1
+```
+
+NOTE: it is pointless to supply a `sed` command in this case but nevertheless
+you must do so.
+
+### Dry-run mode: _ONLY SHOW_ sed commands with the files found rather than actually running sed on them
+
+If you want to see the sed command along with the files found _WITHOUT_ touching
+them you can use the `-n` option with a verbosity level greater than or equal to
+1 like so:
+
+```sh
+sgit -v 1 -n -e 's/foo/bar/g' .
+```
+
+This would show every file along with the sed command, `s/foo/bar/g`, which if used without
+the `-n` would actually be run on each file found. For instance, the above
+command might show:
+
+```sh
+$ sgit -v 1 -n -e 's/foo/bar/g' .
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g .gitignore
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g CHANGES.md
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g Makefile
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g README.md
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g sgit
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g sgit.1
+```
+
+If verbosity is 2 or 3 you would see respectively:
+
+```sh
+$ sgit -v 2 -n -e 's/foo/bar/g' .
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g .gitignore
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g CHANGES.md
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g Makefile
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g README.md
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g sgit
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g sgit.1
+```
+
+and
+
+```sh
+$ sgit -v 3 -n -e 's/foo/bar/g' .
+debug[2]: sed commands:  -e	s/foo/bar/g
+debug[2]: looping through all globs
+debug[2]: found glob: 0
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g .gitignore
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g CHANGES.md
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g Makefile
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g README.md
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g sgit
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g sgit.1
+debug[2]: 0 remaining globs
+```
+
+If you were to specify more than one command you might see something like:
+
+```sh
+$ sgit -n -v 3 -e 's/foo/bar/g' -e 's/FOO/BAR/g' .
+debug[2]: sed commands:  -e	s/foo/bar/g	-e	s/FOO/BAR/g
+debug[2]: looping through all globs
+debug[2]: found glob: 0
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g -e s/FOO/BAR/g .gitignore
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g -e s/FOO/BAR/g CHANGES.md
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g -e s/FOO/BAR/g Makefile
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g -e s/FOO/BAR/g README.md
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g -e s/FOO/BAR/g sgit
+/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g -e s/FOO/BAR/g sgit.1
+debug[2]: 0 remaining globs
+```
 
 ## Installation
 
