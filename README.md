@@ -400,6 +400,9 @@ backup files if you wish and much more.
 `sgit` version `0.0.9-1 24-04-2023` added support to use the `-o` option more
 than once. Not allowing this was an oversight.
 
+[Landon Curt Noll](http://www.isthe.com/chongo/) provided some valuable thoughts
+and suggested the `-n` option.  This was initially added in version `0.0.14-1
+03-10-2023`. Thank you Landon!
 
 ## Other thoughts
 
