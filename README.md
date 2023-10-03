@@ -50,7 +50,7 @@ evolution of the script.
 ## Usage
 
 ```sh
-usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s sed] [-e command] <glob...>
+usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s sed] [-e command] [-n] <glob...>
 
     -h			    print help and exit
     -V			    print version and exit
@@ -72,8 +72,12 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s se
 
     -s sed		    set path to sed
     -e command		    append sed command to list of commands to execute on globs
+    -n			    dry-run: only show files that would be modified but do not touch them
 
-sgit version: 0.0.12-1 29-04-2023
+				NOTE: depending on verbosity level, only the files considered will
+				be printed or the sed commands along with the files will be printed
+
+sgit version: 0.0.14-1 03-10-2023
 ```
 
 You **MUST** specify at least one `sed` command and one glob: the `sed` command

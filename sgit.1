@@ -10,7 +10,7 @@
 .\" prompting me to write this tool - and above all my dear Mum Dianne and my
 .\" wonderful cousin Dani.
 .\"
-.TH sgit 1 "02 October 2023" "sgit" ""
+.TH sgit 1 "03 October 2023" "sgit" ""
 .SH NAME
 .B sgit
 \- run 
@@ -36,6 +36,8 @@ control
 .IR sed \|]
 .RB [\| \-e
 .IR command \|]
+.RB [\| \-n \|]
+.IR glob...
 .SH DESCRIPTION
 .B sgit
 allows one to run
@@ -76,6 +78,18 @@ option.
 This is not very useful in most cases but it is good for debugging.
 If you want verbose output to see what the script is doing you can specify a debug level with
 .BR \-v .
+.PP
+The
+.B \-n
+option will enable dry\-run mode.
+If there is a verbosity level greater than or equal to 1 it will show the
+.BR sed (1)
+command that would have been done on each file if the
+.B \-n
+option was not used.
+Otherwise it will only show the files that would be acted on if the
+.B \-n
+option was not used.
 .PP
 Any text after the final option is considered a glob.
 At least one
@@ -144,6 +158,18 @@ Set path to
 .TP
 .BI \-e\  command
 Append
+.BR sed (1)
+command to commands list.
+.TP
+.B \-n
+Enable dry-mode.
+If verbosity is set to greater than or equal to 1 it will show what
+.BR sed (1)
+commands would have been run on each file if the
+.B \-n
+option was not used; otherwise it will only show the files that would have been touched if the
+.B \-n
+option was not used.
 .BR sed (1)
 command to list of commands to execute on globs
 .SH EXIT STATUS
