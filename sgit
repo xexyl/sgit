@@ -58,7 +58,6 @@ USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o
     -s sed		    set path to sed
     -e command		    append sed command to list of commands to execute on globs
 
-
     -n			    dry-run: only show files that would be modified but do not touch them
 
 				NOTE: depending on verbosity level, only the files considered will
