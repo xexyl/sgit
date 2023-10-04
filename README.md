@@ -28,10 +28,11 @@ to `sed` have been tested.
 
 By default it does **in-place editing and it does NOT backup files**. If you
 wish to not edit the file in place (see [examples](#examples) later in this
-file) you can use the `sgit -I` option. Note that the `-n` option (`sgit -o -n`)
-without `sgit -I` can, depending on the sed commands, empty files! This is
-analogous to using both `-n` and `-i` to `sed` which would do in-place editing
-without automatic printing of the pattern space. An example is provided later.
+file) you can use the `sgit -I` option. Note that the `sed` option `-n` (`sgit
+-o -n`) without `sgit -I` can, depending on the sed commands, empty files! This
+is analogous to using both `-n` and `-i` to `sed` which would do in-place
+editing without automatic printing of the pattern space. An example is provided
+later.
 
 If you wish to provide a backup extension for editing files use `sgit -i`. See
 example below. Note that using `-i` overwrites existing backup files and it will
@@ -62,13 +63,15 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s se
 				WARNING: sed -i overwrites existing backup files
 				WARNING: this will create or update a file for each file changed
 
-    -o sed_option	    append sed option or options to options list
+    -o sed_option	    append sed option to options list
 				WARNING: use of '-o -n' without '-I', can depending on
 				sed commands, empty files as if both sed -i and sed -n were
 				used together
 
 				NOTE: you must pass the '-' for short options and '--' for long options!
 				NOTE: if you need a space in an option you should quote it!
+				NOTE: trying to use this option once to add more than one command can be problematic
+				depending on how you do it so it is better to do only one command at a time
 
     -s sed		    set path to sed
     -e command		    append sed command to list of commands to execute on globs
@@ -88,6 +91,9 @@ by way of the `-e` option (analogous to `sed -e`); anything after the last optio
 is a glob. You may specify more than one of each. Specify `-e` for each command.
 The `sed` commands is an array just like the `sed` options.
 
+Note that although in some cases it is possible to specify more than one command
+with just one `-e` option it can end up resulting in a `sed` error so it is
+recommended that you use `-e` for each command.
 
 ## A note about the `-i` option and backup extensions
 

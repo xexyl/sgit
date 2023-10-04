@@ -47,13 +47,15 @@ USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o
 				WARNING: sed -i overwrites existing backup files
 				WARNING: this will create or update a file for each file changed
 
-    -o sed_option	    append sed option or options to options list
+    -o sed_option	    append sed option to options list
 				WARNING: use of '-o -n' without '-I', can depending on
 				sed commands, empty files as if both sed -i and sed -n were
 				used together
 
 				NOTE: you must pass the '-' for short options and '--' for long options!
 				NOTE: if you need a space in an option you should quote it!
+				NOTE: trying to use this option once to add more than one command can be problematic
+				depending on how you do it so it is better to do only one command at a time
 
     -s sed		    set path to sed
     -e command		    append sed command to list of commands to execute on globs
