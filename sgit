@@ -33,7 +33,7 @@
 # - Cody Boone Ferguson (@xexyl)
 #
 
-export SGIT_VERSION="0.0.16-1 03-10-2023" # format: major.minor.patch-release DD-MM-YYYY
+export SGIT_VERSION="0.0.17-1 04-10-2023" # format: major.minor.patch-release DD-MM-YYYY
 
 USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s sed] [-e command] [-n] <glob...>
 
@@ -67,6 +67,16 @@ USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o
 
 
 sgit version: $SGIT_VERSION"
+
+# before we do anything check that this is a git repo!
+git status 2>/dev/null 1>&2
+status="$?"
+if [[ "$status" -ne 0 ]]; then
+    echo "$USAGE" 1>&2
+    echo 1>&2
+    echo "$(basename "$0"): ERROR: ${PWD} is not a git repository" 1>&2
+    exit 1
+fi
 
 SED="$(type -P sed)"
 export SED
@@ -162,14 +172,6 @@ if [[ "$#" -eq 0 ]]; then
     echo 1>&2
     echo "$(basename "$0"): ERROR: you must specify at least one glob" 1>&2
     exit 3
-fi
-
-# then check that this is a git repo!
-git status 2>/dev/null 1>&2
-status="$?"
-if [[ "$status" -ne 0 ]]; then
-    echo "$(basename "$0"): ERROR: ${PWD} not a git repository" 1>&2
-    exit 1
 fi
 
 if [[ $VERBOSITY -gt 1 ]]; then

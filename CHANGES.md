@@ -1,3 +1,10 @@
+# Version 0.0.17-1 04-10-2023
+
+Check that directory is a git repository before anything else. This saves the
+user from having to get a command line right (if they didn't or didn't provide
+one) only to find out it's not a git repository.
+
+It does print the usage in this case followed by the error.
 
 # Version 0.0.16-1 03-10-2023
 
