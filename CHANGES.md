@@ -1,3 +1,14 @@
+# Version 1.0.0-1 06-10-2023
+
+Add `-t` option to test each `sed` command specified. This option does not make
+use of globs and it does not use `sed` options.
+
+If `-v 1` (or greater than 1) is used then it will show what `sed` command is
+about to be tested. In that case if all is okay it will append 'OK'; otherwise
+what `sed` prints will be appended. If `-v 0` (or `-v` not used) it will not
+show anything if no errors and otherwise it will show whatever error `sed`
+shows, one per `sed` command.
+
 # Version 0.0.17-1 04-10-2023
 
 Check that directory is a git repository before anything else. This saves the
