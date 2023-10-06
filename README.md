@@ -42,6 +42,14 @@ be 50 new files created. Using this option might be of limited use, of course,
 since files under git control can be restored, compared etc. but it's there in
 case one wants it.
 
+A dry-run option exists, `-n`, which will depending on verbosity level show just
+the files that `sed` would run on or the files and the `sed` commands, one file
+per line.
+
+If you need to test the `sed` commands for syntax errors you can do so with the
+`-t` option. With verbosity level >= 1 it will show which `sed` command is being
+tested.
+
 See the usage below or run `sgit` by itself (or with the `-h` option) to see the
 rest of the options.
 
@@ -51,7 +59,7 @@ evolution of the script.
 ## Usage
 
 ```sh
-usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s sed] [-e command] [-n] <glob...>
+usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s sed] [-e command] [-n] [-t] <glob...>
 
     -h			    print help and exit
     -V			    print version and exit
@@ -82,14 +90,19 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s se
 				be printed or the sed commands along with the files will be printed
 				NOTE: use of -n prevents sed commands from being run
 
+    -t			    test sed commands and exit
 
-sgit version: 0.0.17-1 04-10-2023
+				NOTE: this does NOT test sed options
+
+
+sgit version: 1.0.0-1 06-10-2023
 ```
 
-You **MUST** specify at least one `sed` command and one glob: the `sed` command
-by way of the `-e` option (analogous to `sed -e`); anything after the last option
-is a glob. You may specify more than one of each. Specify `-e` for each command.
-The `sed` commands is an array just like the `sed` options.
+You **MUST** specify at least one `sed` command and if the `-t` option is not
+used you must also specify at least one glob: the `sed` command by way of the
+`-e` option (analogous to `sed -e`); anything after the last option is a glob.
+You may specify more than one of each. Specify `-e` for each command.  The `sed`
+commands is an array just like the `sed` options.
 
 Note that although in some cases it is possible to specify more than one command
 with just one `-e` option it can end up resulting in a `sed` error so it is
@@ -253,6 +266,13 @@ sgit -e '1s/\(\<sed\>\)/u\1/g' README.md
 sgit -e '3s/\<sgit\>/gits/g' README.md
 ```
 
+### Change `\<sgit\>` to `gits` and then back to `sgit` but only if it's on the third line
+
+
+```sh
+sgit -e '3s/\<sgit\>/gits/g' -e '3s/\<gits\>/sgits/g' README.md
+```
+
 ### Dry-run mode: _ONLY SHOW_ files that would be modified rather than modify them
 
 If you want to _ONLY SEE FILES_ that would be considered _WITHOUT_ touching them you
@@ -349,11 +369,83 @@ debug[2]: found glob: 0
 debug[2]: 0 remaining globs
 ```
 
+### Test `sed` command or commands without doing anything else
+
+If you want to verify that there is no syntax error in the `sed` commands you
+can do so with the `-t` option. If there is an error in syntax the error message
+comes not from the script but rather `sed` so you will have to parse the
+sometimes cryptic `sed` error messages.
+
+With verbosity level >= 1 it will show each `sed` command that is being tested
+before testing it.
+
+If there is no error no output will be displayed unless verbosity is high enough
+to show the command being tested and the `OK` status. If no `sed` commands have
+an error the exit code will be 0.
+
+If there is an error the `sed` error will be shown, either along with the `sed`
+command itself or just the error message. In any event if any `sed` command has
+an error it will exit with a non-zero value.
+
+Here are several examples showing this feature.
+
+These first ones have a sed syntax error:
+
+```sh
+$ sgit -t -e 's'
+sed: -e expression #1, char 2: unterminated `s' command
+$ sgit -t -e '1p 1p'
+sed: -e expression #1, char 5: extra characters after command
+$ sgit -t -e -e 's/foo/'
+sed: -e expression #1, char 2: unknown command: `-'
+```
+
+This next one has two `sed` commands one of which has a syntax error. Since we
+have more than one command let's also specify `-v 1` to show which command has
+the problem and which one does not:
+
+```sh
+$ sgit -v 1 -t -e 's/foo//g' -e 's/foo/'
+testing sed -e s/foo//g: OK
+testing sed -e s/foo/: sed: -e expression #1, char 7: unterminated `s' command
+```
+
+This example has two `sed` commands both of which have an error:
+
+```sh
+$ sgit -v 1 -t -e -s -e s
+testing sed -e -s: sed: -e expression #1, char 2: unknown command: `-'
+testing sed -e s: sed: -e expression #1, char 2: unterminated `s' command
+```
+
+Finally here are two sets of two examples with no syntax errors, the first set
+showing the `sed` commands and the second one not showing it. In each set the
+first invocation with just one `sed` command and the second with two.
+
+
+```sh
+$ sgit -v 1 -t -e 's/foo/bar/g'
+testing sed -e s/foo/bar/g: OK
+$ sgit -t -v 1 -e 's/foo/bar/g' -e 's/bar/gaz/'
+testing sed -e s/foo/bar/g: OK
+testing sed -e s/bar/gaz/: OK
+```
+
+As noted above if you don't want any output on no errors then keep verbosity
+level at 0 like:
+
+```sh
+$ sgit -t -e 's/foo/bar/g'
+$ sgit -t -e 's/foo/bar/g' -e 's/bar/gaz/'
+$
+```
+
 ## Installation
 
-If you wish to install it you may either copy it to a place in your path or if
-you have `make` installed you can just run `make install` either as root or via
-`sudo` like:
+If you wish to install it (which would be useful since you must run the script
+in a git repo and the odds are you won't be running it in this repo :-) )  you
+may either copy it to a place in your path or if you have `make` installed you
+can just run `make install` either as root or via `sudo` like:
 
 ```sh
 sudo make install
@@ -372,7 +464,8 @@ None known but it does not try and determine which files match the patterns.
 This would likely greatly complicate the script and is I feel unneeded.
 
 If you specify invalid `sed` commands obviously there will be problems. If you
-specify invalid `sed` options there will possibly be problems as well.
+specify invalid `sed` options there will possibly be problems as well. As noted
+earlier you can test the `sed` commands.
 
 As below this was originally a hack.
 
@@ -413,7 +506,7 @@ and suggested the `-n` option.  This was initially added in version `0.0.14-1
 Pull requests are welcome but I think it's mostly in a good enough state where
 this will probably generally not be needed.
 
-## Dedications
+## Dedications and thanks
 
 This is dedicated to the [IOCCC](https://www.ioccc.org), the [IOCCC
 judges](https://www.ioccc.org/judges.html) especially ([Landon Curt
@@ -422,3 +515,8 @@ jokes, telling me history of different things about Unix, C and other things and
 giving me the wonderful opportunity to help so much with the IOCCC - prompting
 me to write this tool - and above all my dear Mum Dianne and my wonderful cousin
 Dani.
+
+Thanks go to Landon for the suggesting of `-n` and what ended up as the test
+option `-t` and for testing the script and even making use of it in his [calc
+repo](https://github.com/lcn2/calc), verifying that it really does work well not
+only for me but others as well.

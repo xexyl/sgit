@@ -10,7 +10,7 @@
 .\" prompting me to write this tool - and above all my dear Mum Dianne and my
 .\" wonderful cousin Dani.
 .\"
-.TH sgit 1 "03 October 2023" "sgit" ""
+.TH sgit 1 "06 October 2023" "sgit" ""
 .SH NAME
 .B sgit
 \- run 
@@ -37,6 +37,7 @@ control
 .RB [\| \-e
 .IR command \|]
 .RB [\| \-n \|]
+.RB [\| \-t \|]
 .IR glob...
 .SH DESCRIPTION
 .B sgit
@@ -90,6 +91,16 @@ option was not used.
 Otherwise it will only show the files that would be acted on if the
 .B \-n
 option was not used.
+.PP
+If you wish to just test the
+.BR sed (1)
+commands without doing anything else, say to debug the commands before you perform them on any files, use the
+.B \-t
+option.
+It will act on an empty string, redirecting standard output to /dev/null but any error will be shown.
+With verbosity level 1 or greater it will show which
+.BR sed (1)
+command is being tested to help you identify which command has an error.
 .PP
 Any text after the final option is considered a glob.
 At least one
@@ -178,6 +189,16 @@ prevents
 .BR sed (1)
 commands from being run.
 .RE
+.TP
+.B \-t
+Test the
+.BR sed (1)
+command or commands without performing them on any glob.
+This can be useful to check for syntax errors before worrying about modifying files.
+It acts on an empty string and will show only errors if any, exiting non-zero if there is an error and 0 if there is not.
+Using
+.B \-v
+with a verbosity level greater than or equal to 1 can help you identify which sed command or commands have an error.
 .SH EXIT STATUS
 .TP
 0
