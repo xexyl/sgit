@@ -22,9 +22,11 @@ it with `-o` first.
 
 This was a stylistic choice but it allows one to quote (which is probably always
 preferable) the option arg to pass more than one option instead of having to use
-`sgit -o` more than once though you can certainly use the option more than once.
-If there's a need for a space then you must quote it.  Note that not all options
-to `sed` have been tested.
+`sgit -o` more than once though you can certainly use the option more than once
+(and it's generally preferable as there are cases where it is problematic to
+not). If there's a need for a space then you must quote it.  Note that not all
+options to `sed` have been tested: not only with using only one `-o` but not
+every option of `sed` has been tested at all.
 
 By default it does **in-place editing and it does NOT backup files**. If you
 wish to not edit the file in place (see [examples](#examples) later in this
@@ -95,7 +97,7 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s se
 				NOTE: this does NOT test sed options
 
 
-sgit version: 1.0.0-1 06-10-2023
+sgit version: 1.0.0-2 11-10-2023
 ```
 
 You **MUST** specify at least one `sed` command and if the `-t` option is not
@@ -513,8 +515,8 @@ judges](https://www.ioccc.org/judges.html) especially ([Landon Curt
 Noll](http://www.isthe.com/chongo/)) for the friendship, telling me stories and
 jokes, telling me history of different things about Unix, C and other things and
 giving me the wonderful opportunity to help so much with the IOCCC - prompting
-me to write this tool - and above all my dear Mum Dianne and my wonderful cousin
-Dani.
+me to write this tool - and above all my dear sweet Mum Dianne and my wonderful
+cousin Dani.
 
 Thanks go to Landon for the suggesting of `-n` and what ended up as the test
 option `-t` and for testing the script and even making use of it in his [calc

@@ -27,13 +27,13 @@
 # (http://www.isthe.com/chongo/) for the friendship, telling me stories and
 # jokes, telling me history of different things about Unix, C and other things
 # and giving me the wonderful opportunity to help so much with the IOCCC -
-# prompting me to write this tool - and above all my dear Mum Dianne and my
-# wonderful cousin Dani.
+# prompting me to write this tool - and above all my dear sweet Mum Dianne and
+# my wonderful cousin Dani.
 #
 # - Cody Boone Ferguson (@xexyl)
 #
 
-export SGIT_VERSION="1.0.0-1 06-10-2023" # format: major.minor.patch-release DD-MM-YYYY
+export SGIT_VERSION="1.0.0-2 11-10-2023" # format: major.minor.patch-release DD-MM-YYYY
 
 USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s sed] [-e command] [-n] [-t] <glob...>
 
@@ -180,7 +180,7 @@ if [[ -n "$TEST_SED_COMMANDS" ]]; then
     STATUS=0
     for i in "${SED_COMMANDS[@]}"; do
 	if [[ "$VERBOSITY" -ge 1 ]]; then
-	    echo -n "testing sed  $i: " 1>&2
+	    echo -n "testing sed $i: " 1>&2
 	fi
 
 	echo "" | sed "$i" >/dev/null
@@ -223,12 +223,12 @@ while [[ "$i" -lt "$GLOBS" ]]; do
 
     if [[ "$VERBOSITY" -ge 1 && -z "$DRY_RUN_OPTION" ]]; then
 	if [[ -z "$I_FLAG" ]]; then
-	    # SC2128 (warning): Expanding an array without an index only gives the first element.
-	    # shellcheck disable=SC2128
-	    #
 	    # Determine if any sed options were specified. We only need to know
 	    # if the array is empty or not; we do not need to expand it in the
-	    # check.
+	    # check so we disable this warning:
+	    #
+	    # SC2128 (warning): Expanding an array without an index only gives the first element.
+	    # shellcheck disable=SC2128
 	    if [[ -n "$SED_OPTIONS" ]]; then
 		echo "debug[1]: about to run: git ls-files $1 | xargs $SED -i\"$EXTENSION\" ${SED_OPTIONS[*]} ${SED_COMMANDS[*]}" 1>&2
 	    else

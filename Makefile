@@ -32,7 +32,7 @@ install:
 shellcheck: sgit
 	@${SHELLCHECK} sgit
 
-check_man:
+check_man: ${ALL_MAN_TARGETS}
 	@if ! type -P ${CHECKNR} >/dev/null 2>&1; then \
             echo 'The ${CHECKNR} command could not be found.' 1>&2; \
             echo 'The ${CHECKNR} command is required to run the $@ rule.' 1>&2; \
