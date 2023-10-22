@@ -33,7 +33,7 @@
 # - Cody Boone Ferguson (@xexyl)
 #
 
-export SGIT_VERSION="1.0.0-2 11-10-2023" # format: major.minor.patch-release DD-MM-YYYY
+export SGIT_VERSION="1.0.0-3 22-10-2023" # format: major.minor.patch-release DD-MM-YYYY
 
 USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s sed] [-e command] [-n] [-t] <glob...>
 
@@ -48,27 +48,29 @@ USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o
 				WARNING: this will create or update a file for each file changed
 
     -o sed_option	    append sed option to options list
-				WARNING: use of '-o -n' without '-I', can depending on
-				sed commands, empty files as if both sed -i and sed -n were
+				WARNING: use of 'sgit -o -n' without 'sgit -I', can depending on
+				sed commands, empty files as if both 'sed -i' and 'sed -n' were
 				used together
 
 				NOTE: you must pass the '-' for short options and '--' for long options!
 				NOTE: if you need a space in an option you should quote it!
-				NOTE: trying to use this option once to add more than one command can be problematic
-				depending on how you do it so it is better to do only one command at a time
+				NOTE: trying to use this option once to add more than one command can be
+				problematic depending on how you do it so it is better to do only one
+				command at a time
 
     -s sed		    set path to sed
     -e command		    append sed command to list of commands to execute on globs
 
-    -n			    dry-run: only show files that would be modified but do not touch them
+    -n			    dry-run: don't run sed, only show files or sed commands with files
 
-				NOTE: depending on verbosity level, only the files considered will
-				be printed or the sed commands along with the files will be printed
-				NOTE: use of -n prevents sed commands from being run
+				NOTE: if verbosity is > 1 (-v 2)  we show the sed commands along with any sed
+				options (if sgit -o used) and the files found; otherwise we only show
+				the files found.
+				NOTE: use of sgit -n prevents sed commands from being run
 
     -t			    test sed commands and exit
 
-				NOTE: this does NOT test sed options
+				NOTE: this does NOT test sed options (sgit -o)
 
 
 sgit version: $SGIT_VERSION"
@@ -90,6 +92,7 @@ export TEST_SED_COMMANDS=""
 export VERBOSITY=0
 export EXTENSION=""
 export DRY_RUN_OPTION=""
+export TRACE_MODE=""
 
 # we need an array for sed commands
 declare -a SED_COMMANDS
@@ -111,7 +114,7 @@ while getopts :hVv:xIi:o:s:e:nt flag; do
 	;;
     v)	VERBOSITY="$OPTARG";
 	;;
-    x)	set -x
+    x)	TRACE_MODE="-x";
 	;;
     I)	I_FLAG="-I"
 	;;
@@ -174,16 +177,42 @@ elif [[ ! -x "$SED" ]]; then
     exit 3
 fi
 
+if [[ "$VERBOSITY" -gt 3 ]]; then
+    echo "debug[4]: sed: $SED" 1>&2
+    echo "debug[4]: backup extension: '$EXTENSION'" 1>&2
+    if [[ -n "$I_FLAG" ]]; then
+	echo "debug[4]: in-place editing disabled" 1>&2
+    else
+	echo "debug[4]: in-place editing enabled" 1>&2
+    fi
+    if [[ -n "$TEST_SED_COMMANDS" ]]; then
+	echo "debug[4]: test mode enabled" 1>&2
+    else
+	echo "debug[4]: test mode disabled" 1>&2
+    fi
+    if [[ -n "$TRACE_MODE" ]]; then
+	echo "debug[4]: trace mode enabled" 1>&2
+    else
+	echo "debug[4]: trace mode disabled" 1>&2
+    fi
+fi
+
+# if -x used then turn on tracing
+if [[ -n "$TRACE_MODE" ]]; then
+    set -x
+fi
+
 # if we are just testing sed commands we can do that now without checking for
-# globs
+# globs as we can run sed on an empty string with the same effect. This is why
+# if -t is used we don't need any globs specified
 if [[ -n "$TEST_SED_COMMANDS" ]]; then
     STATUS=0
-    for i in "${SED_COMMANDS[@]}"; do
+    for cmd in "${SED_COMMANDS[@]}"; do
 	if [[ "$VERBOSITY" -ge 1 ]]; then
-	    echo -n "testing sed $i: " 1>&2
+	    echo -n "testing: 'sed $cmd': " 1>&2
 	fi
 
-	echo "" | sed "$i" >/dev/null
+	echo "" | sed "$cmd" >/dev/null
 	if [[ "${PIPESTATUS[1]}" -ne 0 ]]; then
 	    STATUS=1
 	elif [[ "$VERBOSITY" -ge 1 ]]; then
@@ -203,79 +232,150 @@ if [[ "$#" -eq 0 ]]; then
     exit 3
 fi
 
-if [[ $VERBOSITY -gt 1 ]]; then
+# Depending on verbosity we will show the sed commands and report that we will
+# loop through all globs. Later on depending on the verbosity the glob being
+# processed will be shown
+if [[ "$VERBOSITY" -gt 1 ]]; then
     echo "debug[2]: sed commands:  ${SED_COMMANDS[*]}" 1>&2
-    echo "debug[2]: looping through all globs" 1>&2
+    if [[ "$VERBOSITY" -gt 2 ]]; then
+	echo "debug[2]: looping through all globs" 1>&2
+    fi
 fi
 
+# if an extension was provided with -i and verbosity is > 0 we will show the
+# extension, even if it's an empty string (the default)
 if [[ -n "$EXTENSION" ]]; then
     if [[ "$VERBOSITY" -ge 1 ]]; then
 	echo "debug[1]: using backup extension: $EXTENSION" 1>&2
     fi
 fi
 
+# we need to get the number of globs
 GLOBS="$#"
+
+# the counter to show which glob this is
+# NOTE: one of the reasons it is zero based because real programmers start with
+# 0
 i=0
+
+# as long as we have a glob we have to process it
 while [[ "$i" -lt "$GLOBS" ]]; do
     if [[ "$VERBOSITY" -gt 1 ]]; then
+	# verbosity > 1: show the glob found on the command line
 	echo "debug[2]: found glob: $i" 1>&2
     fi
 
+    # if verbosity > 1 && -n not used:
     if [[ "$VERBOSITY" -ge 1 && -z "$DRY_RUN_OPTION" ]]; then
+	# If in-in place editing in use (i.e. -I not used = the default), we
+	# have to show what would be run at this point, specifying the extension
+	# (by default empty but can be modified with the sgit -i option).
 	if [[ -z "$I_FLAG" ]]; then
-	    # Determine if any sed options were specified. We only need to know
-	    # if the array is empty or not; we do not need to expand it in the
-	    # check so we disable this warning:
 	    #
-	    # SC2128 (warning): Expanding an array without an index only gives the first element.
+	    # first we determine if any sed options were specified.
+	    #
+	    # We only need to know if the array is empty or not; we do not need
+	    # to expand it in the check so we disable this ShellCheck warning:
+	    #
+	    #	SC2128 (warning): Expanding an array without an index only gives the first element.
+	    # 
 	    # shellcheck disable=SC2128
+
+	    # if sed options were specified (sgit -o was used) we need to show
+	    # the options along with the commands to be run on the files found.
 	    if [[ -n "$SED_OPTIONS" ]]; then
 		echo "debug[1]: about to run: git ls-files $1 | xargs $SED -i\"$EXTENSION\" ${SED_OPTIONS[*]} ${SED_COMMANDS[*]}" 1>&2
+
+	    # if, however, sed options were not used (sgit -o NOT used) we only show the
+	    # sed commands to be run on the files found.
 	    else
 		echo "debug[1]: about to run: git ls-files $1 | xargs $SED -i\"$EXTENSION\" ${SED_COMMANDS[*]}" 1>&2
 	    fi
+	# otherwise, if we're not to do in place editing (i.e. sgit -I used),
+	# show that sgit will NOT use sed with in-place editing mode (i.e. sed
+	# -i will NOT be used)
 	else
+	    # if sed options specified (sgit -o) we show the sed command with
+	    # options run on any files found.
 	    if [[ -n "$SED_OPTIONS" ]]; then
 		echo "debug[1]: about to run: git ls-files $1 | xargs $SED ${SED_OPTIONS[*]} ${SED_COMMANDS[*]}" 1>&2
+	    # otherwise, if sed options not specified (sgit -o NOT used), we have to show
+	    # just the sed command on the files found.
 	    else
 		echo "debug[1]: about to run: git ls-files $1 | xargs $SED ${SED_COMMANDS[*]}" 1>&2
 	    fi
 	fi
     fi
 
+    # now if dry run (sgit -n) was used we DON'T run sed but just print out what
+    # files would be acted on OR, if verbosity level is high enough (> 0), we
+    # print the COMMAND AND THE FILE NAME, one file at a time
     if [[ -n "$DRY_RUN_OPTION" ]]; then
+	# if we have sed options (sgit -o) then we print either
+	# just the files or the command AND files with the sed options assuming
+	# verbosity > 0. Of course if verbosity is NOT > 0 then it's kind of
+	# pointless to check the sed options being specified but we do it to be
+	# complete
 	if [[ -n "$SED_OPTIONS" ]]; then
+	    # sgit -o used: we have sed options
 	    for f in $(git ls-files "$1" | xargs); do
 		if [[ "$VERBOSITY" -ge 1 ]]; then
+		    # verbosity is high enough: we have sed options so show the
+		    # full sed command
 		    echo "$SED" -i"$EXTENSION" "${SED_OPTIONS[*]}" "${SED_COMMANDS[@]}" "$f" 1>&2
 		else
+		    # here verbosity is not high enough (< 1) so we just show
+		    # the files that sed would run on without the -n option
 		    echo "$f" 1>&2
 		fi
 	    done
+	# otherwise, if we reach this else, we know that there are no sed options
+	# so we show either sed commands in full (with file) or just the files,
+	# depending on the verbosity
 	else
+	    # for each file found with the current glob...
 	    for f in $(git ls-files "$1"); do
 		if [[ "$VERBOSITY" -ge 1 ]]; then
+		    # verbosity is high enough so we show the sed commands with
+		    # the files found for this glob
 		    echo "$SED" -i"$EXTENSION" "${SED_COMMANDS[@]}" "$f" 1>&2
 		else
+		    # here we just show the files that would be acted on
 		    echo "$f" 1>&2
 		fi
 	    done
 	fi
+    # here we can actually run commands!
     elif [[ -z "$I_FLAG" ]]; then
+	# no -I flag so we do an in-place edit (which was the initial purpose of
+	# this script)
 	if [[ -n "$SED_OPTIONS" ]]; then
+	    # we have sed options (sgit -o) so we have to run sed with the
+	    # options specified, on the files found
 	    git ls-files "$1" | xargs "$SED" -i"$EXTENSION" "${SED_OPTIONS[*]}" "${SED_COMMANDS[@]}"
 	else
+	    # we don't have any sed options (sgit -o NOT used) so just run the sed
+	    # commands with the extension (default empty)
 	    git ls-files "$1" | xargs "$SED" -i"$EXTENSION" "${SED_COMMANDS[@]}"
 	fi
     else
+	# -I specified: we do NOT want to do an in-place edit here but we do
+	# still have to check for sed options (sgit -o)
 	if [[ -n "$SED_OPTIONS" ]]; then
+	    # sed options (sgit -o) were specified so run sed on the files with
+	    # the sed options
 	    git ls-files "$1" | xargs "$SED" "${SED_OPTIONS[*]}" "${SED_COMMANDS[@]}"
 	else
+	    # as no sgit -o was used we just run the sed commands on the files
 	    git ls-files "$1" | xargs "$SED" "${SED_COMMANDS[@]}"
 	fi
     fi
+
+    # this here makes us go to the next glob, if there is one
     ((i++))
     shift 1
+
+    # if verbosity > 2 and there are globs left we will print how many remain
     if [[ "$VERBOSITY" -gt 2 ]]; then
 	if [[ "$#" -eq 1 ]]; then
 	    echo "debug[2]: $# remaining glob" 1>&2
@@ -283,7 +383,8 @@ while [[ "$i" -lt "$GLOBS" ]]; do
 	    echo "debug[2]: $# remaining globs" 1>&2
 	fi
     fi
-
 done
+
+# And...that's all folks!
 
 exit 0

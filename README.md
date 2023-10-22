@@ -74,30 +74,32 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s se
 				WARNING: this will create or update a file for each file changed
 
     -o sed_option	    append sed option to options list
-				WARNING: use of '-o -n' without '-I', can depending on
-				sed commands, empty files as if both sed -i and sed -n were
+				WARNING: use of 'sgit -o -n' without 'sgit -I', can depending on
+				sed commands, empty files as if both 'sed -i' and 'sed -n' were
 				used together
 
 				NOTE: you must pass the '-' for short options and '--' for long options!
 				NOTE: if you need a space in an option you should quote it!
-				NOTE: trying to use this option once to add more than one command can be problematic
-				depending on how you do it so it is better to do only one command at a time
+				NOTE: trying to use this option once to add more than one command can be
+				problematic depending on how you do it so it is better to do only one
+				command at a time
 
     -s sed		    set path to sed
     -e command		    append sed command to list of commands to execute on globs
 
-    -n			    dry-run: only show files that would be modified but do not touch them
+    -n			    dry-run: don't run sed, only show files or sed commands with files
 
-				NOTE: depending on verbosity level, only the files considered will
-				be printed or the sed commands along with the files will be printed
-				NOTE: use of -n prevents sed commands from being run
+				NOTE: if verbosity is > 1 (-v 2)  we show the sed commands along with any sed
+				options (if sgit -o used) and the files found; otherwise we only show
+				the files found.
+				NOTE: use of sgit -n prevents sed commands from being run
 
     -t			    test sed commands and exit
 
-				NOTE: this does NOT test sed options
+				NOTE: this does NOT test sed options (sgit -o)
 
 
-sgit version: 1.0.0-2 11-10-2023
+sgit version: 1.0.0-3 22-10-2023
 ```
 
 You **MUST** specify at least one `sed` command and if the `-t` option is not
@@ -161,6 +163,9 @@ if installed. Otherwise if it's not installed you can do:
 man ./sgit.1
 ```
 
+Of course since this tool must be run in a `git(1)` repo it's not very useful if
+it's not installed. See [Installing](#installing) for how to install this tool.
+
 
 ## Examples
 
@@ -195,15 +200,55 @@ sgit -e 's/\<sed\>/used/p' -x README.md
 
 ## Verbosely (level 1) change references of `\<sed\>` to `used` in this file and save it:
 
+With verbosity level 1 it will show the commands run, both the `git ls-files
+...` piped to `xargs` with `sed(1)`:
+
+
 ```sh
-sgit -e 's/\<sed\>/used/g' -v1 README.md
 sgit -e 's/\<sed\>/used/g' -v 1 README.md
 ```
 
-The two are equivalent but naturally running them in sequence the second one
-would not do anything useful.
+This would show:
+
+```
+debug[1]: about to run: git ls-files README.md | xargs /opt/local/libexec/gnubin/sed -i"" -e s/\<sed\>/used/g
+```
+
+## Verbosely (level 1) change references of `\<sed\>` to `used` in this file with a backup as `README.md.bak`
+
+If you wish to just see the backup extension and the commands to be run, that is
+`git ls-files ... | xargs ...`, use verbosity level 1:
+
+```sh
+$ sgit -i.bak -e 's/\<sed\>/used/g' -v 1 README.md
+debug[1]: using backup extension: .bak
+debug[1]: about to run: git ls-files README.md | xargs /opt/local/libexec/gnubin/sed -i".bak" -e s/\<sed\>/used/g
+```
+
+## Verbosely (level 2) change references of `\<sed\>` to `used` in this file with a backup as `README.md.bak`
+
+With verbosity level 2 the above command, with the added glob that does not
+exist (`foo`), it will show the `sed(1)` commands (or in this case command) and
+after each glob is processed it will show the number of globs remaining:
+
+```sh
+debug[2]: sed commands:  -e s/\<sed\>/used/g
+debug[1]: using backup extension: .bak
+debug[2]: found glob: 0
+debug[1]: about to run: git ls-files README.md | xargs /opt/local/libexec/gnubin/sed -i".bak" -e s/\<sed\>/used/g
+debug[2]: found glob: 1
+debug[1]: about to run: git ls-files foo | xargs /opt/local/libexec/gnubin/sed -i".bak" -e s/\<sed\>/used/g
+/opt/local/libexec/gnubin/sed: no input files
+```
+
+As you can see here, this example also shows what happens if no files are found with
+a glob. However, the README.md file would be acted on.
+
 
 ## Verbosely (level 3) change references of `\<sed\>` to `used` in this file with a backup as `README.md.bak`
+
+
+With verbosity of level 3 it will show more information.
 
 ```sh
 sgit -i.bak -e 's/\<sed\>/used/g' -v 3 README.md
@@ -212,15 +257,15 @@ sgit -i.bak -e 's/\<sed\>/used/g' -v 3 README.md
 With the command you would see something like:
 
 ```sh
-debug[2]: sed commands:  -e	s/\<sed\>/used/g
+debug[2]: sed commands:  -e s/\<sed\>/used/g
 debug[2]: looping through all globs
 debug[1]: using backup extension: .bak
 debug[2]: found glob: 0
-debug[1]: about to run: git ls-files README.md | xargs /opt/local/bin/sed -i".bak" -e	s/\<sed\>/used/g
+debug[1]: about to run: git ls-files README.md | xargs /opt/local/libexec/gnubin/sed -i".bak" -e s/\<sed\>/used/g
 debug[2]: 0 remaining globs
 ```
 
-Level 2 will not show how many globs remain after each operation.
+Level 1 will not show how many globs remain after each operation.
 
 
 ### Verbosely (level 3) change references of `\<used\>` back to `sed` in this file with a backup as `README.md.bak`
@@ -408,16 +453,16 @@ the problem and which one does not:
 
 ```sh
 $ sgit -v 1 -t -e 's/foo//g' -e 's/foo/'
-testing sed -e s/foo//g: OK
-testing sed -e s/foo/: sed: -e expression #1, char 7: unterminated `s' command
+testing: 'sed -e s/foo//g': OK
+testing: 'sed -e s/foo/': sed: -e expression #1, char 7: unterminated `s' command
 ```
 
 This example has two `sed` commands both of which have an error:
 
 ```sh
 $ sgit -v 1 -t -e -s -e s
-testing sed -e -s: sed: -e expression #1, char 2: unknown command: `-'
-testing sed -e s: sed: -e expression #1, char 2: unterminated `s' command
+testing: 'sed -e -s': sed: -e expression #1, char 2: unknown command: `-'
+testing: 'sed -e s': sed: -e expression #1, char 2: unterminated `s' command
 ```
 
 Finally here are two sets of two examples with no syntax errors, the first set
@@ -427,10 +472,10 @@ first invocation with just one `sed` command and the second with two.
 
 ```sh
 $ sgit -v 1 -t -e 's/foo/bar/g'
-testing sed -e s/foo/bar/g: OK
-$ sgit -t -v 1 -e 's/foo/bar/g' -e 's/bar/gaz/'
-testing sed -e s/foo/bar/g: OK
-testing sed -e s/bar/gaz/: OK
+testing: 'sed -e s/foo/bar/g': OK
+$ sgit -t -v 1 -e 's/foo/bar/g' -e 's/bar/baz/g'
+testing: 'sed -e s/foo/bar/g': OK
+testing: 'sed -e s/bar/baz/g': OK
 ```
 
 As noted above if you don't want any output on no errors then keep verbosity
@@ -438,11 +483,47 @@ level at 0 like:
 
 ```sh
 $ sgit -t -e 's/foo/bar/g'
-$ sgit -t -e 's/foo/bar/g' -e 's/bar/gaz/'
+$ sgit -t -e 's/foo/bar/g' -e 's/bar/baz/g'
 $
 ```
 
-## Installation
+Of course, as shown earlier, if either of them have an error it will print out
+the error via `sed(1)` itself:
+
+```sh
+$ sgit -t -e 's'
+sed: -e expression #1, char 2: unterminated `s' command
+$ sgit -t -e 's/e/c' -e 's/e/c/g' -e 's///'
+sed: -e expression #1, char 6: unterminated `s' command
+sed: -e expression #1, char 0: no previous regular expression
+```
+
+which of course is not all that useful.
+
+### Show `sed(1)` path and options used along with just the files that would be acted on (dry-mode)
+
+If you want to see what the options are then specify a verbosity level of 4 or
+greater:
+
+```sh
+$ sgit -n -e 's///g' -s /usr/bin/sed -v 4 README.md sgit
+debug[4]: sed: /usr/bin/sed
+debug[4]: backup extension: ''
+debug[4]: in-place editing enabled
+debug[4]: test mode disabled
+debug[4]: trace mode disabled
+debug[2]: sed commands:  -e s///g
+debug[2]: looping through all globs
+debug[2]: found glob: 0
+/usr/bin/sed -i -e s///g README.md
+debug[2]: 1 remaining glob
+debug[2]: found glob: 1
+/usr/bin/sed -i -e s///g sgit
+debug[2]: 0 remaining globs
+```
+
+
+## Installing
 
 If you wish to install it (which would be useful since you must run the script
 in a git repo and the odds are you won't be running it in this repo :-) )  you
@@ -455,22 +536,13 @@ sudo make install
 
 ## Limitations
 
-One that comes to mind is you cannot specify `git ls-files` options but this
-could be problematic anyway especially if one were to specify the `-z` option.
-
-There are probably other limitations but it works well for what I needed.
-
-## Bugs
-
-None known but it does not try and determine which files match the patterns.
-This would likely greatly complicate the script and is I feel unneeded.
-
 If you specify invalid `sed` commands obviously there will be problems. If you
 specify invalid `sed` options there will possibly be problems as well. As noted
 earlier you can test the `sed` commands.
 
-As below this was originally a hack.
+## Bugs
 
+None known (yet?).
 
 ## History
 
