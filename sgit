@@ -227,7 +227,7 @@ if [[ -n "$TEST_SED_COMMANDS" ]]; then
 fi
 
 # if we didn't test sed commands we have to check the number of remaining args
-if [[ "$#" -eq 0 && -z "$DRY_RUN_OPTION" ]]; then
+if [[ "$#" -eq 0 ]]; then
     echo "$USAGE" 1>&2
     echo 1>&2
     echo "$(basename "$0"): ERROR: you must specify at least one glob" 1>&2
