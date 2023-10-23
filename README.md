@@ -99,7 +99,7 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s se
 				NOTE: this does NOT test sed options (sgit -o)
 
 
-sgit version: 1.0.0-3 22-10-2023
+sgit version: 1.0.0-5 23-10-2023
 ```
 
 You **MUST** specify at least one `sed` command and if the `-t` option is not

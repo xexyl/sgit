@@ -10,7 +10,7 @@
 .\" prompting me to write this tool - and above all my dear Mum Dianne and my
 .\" wonderful cousin Dani.
 .\"
-.TH sgit 1 "06 October 2023" "sgit" ""
+.TH sgit 1 "23 October 2023" "sgit" ""
 .SH NAME
 .B sgit
 \- run 
@@ -105,7 +105,9 @@ command is being tested to help you identify which command has an error.
 Any text after the final option is considered a glob.
 At least one
 .BR sed (1)
-command and one glob must be specified.
+command and one glob must be specified unless
+.B \-t
+is used in which case a glob is not required.
 A glob of
 .I .
 will match all files under git control from the current working directory.

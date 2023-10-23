@@ -33,7 +33,7 @@
 # - Cody Boone Ferguson (@xexyl)
 #
 
-export SGIT_VERSION="1.0.0-4 23-10-2023" # format: major.minor.patch-release DD-MM-YYYY
+export SGIT_VERSION="1.0.0-5 23-10-2023" # format: major.minor.patch-release DD-MM-YYYY
 
 USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s sed] [-e command] [-n] [-t] <glob...>
 
@@ -130,17 +130,20 @@ while getopts :hVv:xIi:o:s:e:nt flag; do
 	;;
     t)	TEST_SED_COMMANDS="-t"
 	;;
-    \?) echo "$0: ERROR: invalid option: -$OPTARG" 1>&2
+    \?) echo "$USAGE" 1>&2
+	echo 1>&2
+	echo "$0: ERROR: invalid option: -$OPTARG" 1>&2
 	exit 3
 	;;
-    :)	echo "$0: ERROR: option -$OPTARG requires an argument" 1>&2
+    :)	echo "$USAGE" 1>&2
 	echo 1>&2
-	echo "$USAGE" 1>&2
+	echo "$0: ERROR: option -$OPTARG requires an argument" 1>&2
+	echo 1>&2
 	exit 3
 	;;
-    *)  echo "$0: ERROR: unexpected value from getopts: $flag" 1>&2
+    *)  echo "$USAGE" 1>&2
 	echo 1>&2
-	echo "$USAGE" 1>&2
+	echo "$0: ERROR: unexpected value from getopts: $flag" 1>&2
 	exit 3
 	;;
     esac
