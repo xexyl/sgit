@@ -9,7 +9,9 @@ might not recurse into subdirectories. That is the shell at work, of course.
 `sgit` is extremely useful because one need not run extra commands to determine
 the list of files (which might be very long) and then pass them directly to
 `sed(1)`. Since it only acts on files under `git` control you need not worry
-about files that are not under git control being touched or even considered.
+about files that are not under git control being touched or even considered. The
+first example in the [examples](#examples) section will show just how useful
+this tool is.
 
 You can specify the path to `sed` in case you wish to use a different one. For
 instance in macOS if you have GNU sed installed you might want to use that
@@ -168,6 +170,30 @@ it's not installed. See [Installing](#installing) for how to install this tool.
 
 
 ## Examples
+
+### Delete first variable number of lines up through but excluding a matching line
+
+In the [IOCCC temporary website](https://github.com/ioccc-src/temp-test-ioccc)
+repo I had to delete the first lines up through the '## To build:' lines
+in **all** README.md files of subdirectories in subdirectories of the years 1984-2020
+but excluding the README.md files of the 1984-2020 README.md files (the format
+of the filenames being YYYY/winner/README.md).
+
+This change was very variable in the number of lines but it was very easy to do
+with `sgit(1)` like so:
+
+```sh
+sgit -o -n -e '/^## To build:/,$p' '[12][0-9][0-9][0-9]/*/README.md'
+```
+
+This would delete the lines up through but excluding '## To build:' in the
+README.md files in subdirectories of directories that start with '1', or '9'
+(the 2 being a typo) followed by 3 digits in the range of 0-9.
+
+As there were a total of _**321**_ of these files this saved a tremendous amount
+of time and prevented very tedious work. As you can see, this tool is very
+useful.
+
 
 ### Change references (_**IN MEMORY ONLY**_ i.e. WITHOUT in-place editing) of the exact word `sed` (as in `\<sed\>`) in this file but only show changed lines
 
