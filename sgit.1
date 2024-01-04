@@ -10,7 +10,7 @@
 .\" prompting me to write this tool - and above all my dear Mum Dianne and my
 .\" wonderful cousin Dani.
 .\"
-.TH sgit 1 "23 October 2023" "sgit" ""
+.TH sgit 1 "04 January 2024" "sgit" ""
 .SH NAME
 .B sgit
 \- run 
@@ -38,6 +38,7 @@ control
 .IR command \|]
 .RB [\| \-n \|]
 .RB [\| \-t \|]
+.RB [\| \-0 \|]
 .IR glob...
 .SH DESCRIPTION
 .B sgit
@@ -111,6 +112,17 @@ is used in which case a glob is not required.
 A glob of
 .I .
 will match all files under git control from the current working directory.
+.PP
+If you require using the
+.B \-z
+option to
+.B git ls\-files
+along with
+.B xargs \-0
+then use the
+.B \-0
+option.
+.PP
 If you run the command from a directory that is not a
 .BR git (1)
 repo it is an error.
@@ -201,6 +213,14 @@ It acts on an empty string and will show only errors if any, exiting non-zero if
 Using
 .B \-v
 with a verbosity level greater than or equal to 1 can help you identify which sed command or commands have an error.
+.TP
+.B \-0
+Use
+.B git ls\-files \-z
+and
+.B xargs \-0\c
+\&.
+
 .SH EXIT STATUS
 .TP
 0

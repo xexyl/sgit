@@ -54,6 +54,13 @@ If you need to test the `sed` commands for syntax errors you can do so with the
 `-t` option. With verbosity level >= 1 it will show which `sed` command is being
 tested.
 
+If you require the `-z` option to `git ls-files` use `-0`. This will force the
+script to also use `xargs -0` which means your `xargs` must allow that option.
+This is not enabled by default for a variety reasons including because POSIX
+does not require `-0` to `xargs(1)`. This option has not been tested well and
+has only been added in case someone needs it. The debug output does not quote
+files with spaces or other unsafe characters either.
+
 See the usage below or run `sgit` by itself (or with the `-h` option) to see the
 rest of the options.
 
@@ -63,7 +70,7 @@ evolution of the script.
 ## Usage
 
 ```sh
-usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s sed] [-e command] [-n] [-t] <glob...>
+usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s sed] [-e command] [-n] [-t] [-0] <glob...>
 
     -h			    print help and exit
     -V			    print version and exit
@@ -100,8 +107,12 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s se
 
 				NOTE: this does NOT test sed options (sgit -o)
 
+    -0			    Use git ls-files -z and xargs -0
 
-sgit version: 1.0.0-5 23-10-2023
+				NOTE: this does not check if your xargs has -0
+
+
+sgit version: 1.0.0-6 04-01-2024
 ```
 
 You **MUST** specify at least one `sed` command and if the `-t` option is not
