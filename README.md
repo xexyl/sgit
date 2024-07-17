@@ -624,8 +624,17 @@ that started with `STATUS` (or now started with `> STATUS`)) and of course
 (since I didn't address this in the command remove the spaces in front of the
 `>` but since I had to edit the files manually anyway this was not a problem.
 
-A caveat, of course, is that I did this in steps (in order to document), but the
-idea is here anyway.
+An added `-e ...` or additional `sgit` command might be:
+
+```
+-e 's/    > \*\*STATUS/> **STATUS/g'
+```
+
+since we start lines in the code blocks with four spaces.
+
+A caveat here, of course, is that I did this in steps (in order to document),
+but the idea is here anyway.
+
 
 ## Installing
 
