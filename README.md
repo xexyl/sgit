@@ -581,7 +581,7 @@ debug[2]: found glob: 1
 debug[2]: 0 remaining globs
 ```
 
-### Surround specific lines with `**` except if they end in `<br>` in which case add the `**` **BEFORE** the `**` at the end of the line
+### Surround specific lines with `**` except if they end in `<br>` in which case add the `**` **BEFORE** the `<br>` at the end of the line
 
 In the [IOCCC temporary website](https://github.com/ioccc-src/temp-test-ioccc)
 repo we had code blocks of the form:
