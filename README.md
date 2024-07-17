@@ -201,12 +201,12 @@ This would delete the lines up through but excluding '## To build:' in the
 README.md files in subdirectories of directories that start with '1', or '9'
 (the 2 being a typo) followed by 3 digits in the range of 0-9.
 
-As there were a total of _**321**_ of these files this saved a tremendous amount
+As there were a total of **321** of these files this saved a tremendous amount
 of time and prevented very tedious work. As you can see, this tool is very
 useful.
 
 
-### Change references (_**IN MEMORY ONLY**_ i.e. WITHOUT in-place editing) of the exact word `sed` (as in `\<sed\>`) in this file but only show changed lines
+### Change references (**IN MEMORY ONLY** i.e. **WITHOUT in-place editing**) of the exact word `sed` (as in `\<sed\>`) in this file but only show changed lines
 
 ```sh
 sgit -I -o -n -e 's/\<sed\>/used/p' README.md
@@ -341,7 +341,7 @@ debug[2]: 0 remaining globs
 sgit -e '1s/\<sed\>/used/g' README.md
 ```
 
-and the title of this document would be: 
+and the title of this document would be:
 
 ```markdown
 # sgit - run used on files under git control
@@ -368,10 +368,10 @@ sgit -e '3s/\<sgit\>/gits/g' README.md
 sgit -e '3s/\<sgit\>/gits/g' -e '3s/\<gits\>/sgit/g' README.md
 ```
 
-### Dry-run mode: _ONLY SHOW_ files that would be modified rather than modify them
+### Dry-run mode: **ONLY _SHOW_** files that would be modified rather than modify them
 
-If you want to _ONLY SEE FILES_ that would be considered _WITHOUT_ touching them you
-can use the `-n` option like so:
+If you want to **ONLY _SEE_ FILES** that would be considered **WITHOUT
+_touching_** them you can use the `-n` option like so:
 
 ```sh
 sgit -n -e '' .
@@ -396,11 +396,11 @@ sgit.1
 NOTE: it is pointless to supply a `sed(1)` command in this case but you may do
 so anyway; it is not required.
 
-### Dry-run mode: _ONLY SHOW_ sed commands with the files found rather than actually running sed on them
+### Dry-run mode: **ONLY _SHOW_** sed commands with the files found rather than actually running sed on them
 
-If you want to see the `sed(1)` command along with the files found _WITHOUT_ touching
-them you can use the `-n` option with a verbosity level greater than or equal to
-1 like so:
+If you want to see the `sed(1)` command along with the files found **WITHOUT
+_touching_** them you can use the `-n` option with a verbosity level greater
+than or equal to 1 like so:
 
 ```sh
 sgit -v 1 -n -e 's/foo/bar/g' .
@@ -581,6 +581,51 @@ debug[2]: found glob: 1
 debug[2]: 0 remaining globs
 ```
 
+### Surround specific lines with `**` except if they end in `<br>` in which case add the `**` **BEFORE** the `**` at the end of the line
+
+In the [IOCCC temporary website](https://github.com/ioccc-src/temp-test-ioccc)
+repo we had code blocks of the form:
+
+```
+STATUS: foo bar baz
+```
+
+and sometimes:
+
+```
+STATUS: foo bar baz
+STATUS: zab rab oof
+```
+
+but it was decided it would be better if these were in a block quote (starting
+with `>`). In the case where there was more than one `STATUS` line we would
+obviously need a `<br>` at the end.
+
+Now I had started without adding the `**`s (as an oversight) and I did add the
+`<br>` in the cases there were additional lines so what could I do to fix not
+only those but the ones that I have not done yet?
+
+The following is what I did:
+
+```sh
+sgit -e 's/\(STATUS.*\)/> \*\*\1\*\*/g' \
+    -e 's/> > \*\*STATUS/> **STATUS/g' \
+    -e 's/<br>\*\*/**<br>/g' '*README.md'
+```
+
+This would address lines that already (now) started with the `>` but other lines
+that just have `STATUS` at the start (or with spaces as in our case) and if the
+lines ended with `<br>` it would put the `<br>` **after** the `**` at the final
+step.
+
+After this all I had to do was to remove the code block formatting (the three
+backticks on the line before the first `STATUS` and the line after the last line
+that started with `STATUS` (or now started with `> STATUS`)) and of course
+(since I didn't address this in the command remove the spaces in front of the
+`>` but since I had to edit the files manually anyway this was not a problem.
+
+A caveat, of course, is that I did this in steps (in order to document), but the
+idea is here anyway.
 
 ## Installing
 
