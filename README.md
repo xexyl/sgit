@@ -657,7 +657,7 @@ earlier you can test the `sed` commands.
 
 None known (yet?).
 
-## History
+## Inspiration and historical context of `sgit`
 
 It has been a persistent problem for me that I need to edit files under git
 control and `sed` is the obvious way to go about it.
