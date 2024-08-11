@@ -70,7 +70,9 @@ evolution of the script.
 ## Usage
 
 ```sh
-usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s sed] [-e command] [-n] [-t] [-0] <glob...>
+usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension]
+	    [-o sed_option] [-s sed] [-g git] [-X xargs]
+	    [-e command] [-n] [-t] [-0] <glob...>
 
     -h			    print help and exit
     -V			    print version and exit
@@ -94,6 +96,9 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s se
 				command at a time
 
     -s sed		    set path to sed
+    -g git		    set path to git
+    -X xargs		    set path to xargs
+
     -e command		    append sed command to list of commands to execute on globs
 
     -n			    dry-run: don't run sed, only show files or sed commands with files
@@ -112,20 +117,32 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension] [-o sed_option] [-s se
 				NOTE: this does not check if your xargs has -0
 
 
-sgit version: 1.0.0-6 04-01-2024
+sgit version: 1.0.0-7 11-08-2024
 ```
 
 You **MUST** specify at least one `sed` command and if the `-t` option is not
 used you must also specify at least one glob: the `sed` command by way of the
-`-e` option (analogous to `sed -e`); anything after the last option is a glob.
-You may specify more than one of each. Specify `-e` for each command.  The `sed`
-commands is an array just like the `sed` options.
+`-e` option (analogous to `sed -e`); anything arg after the last option is a
+glob to be used. You may specify more than one of each. Specify `-e` for each
+command. The `sed` commands is an array just like the `sed` options.
 
 Note that although in some cases it is possible to specify more than one command
 with just one `-e` option it can end up resulting in a `sed` error so it is
 recommended that you use `-e` for each command.
 
-## A note about the `-i` option and backup extensions
+## Required tools: `sed(1)`, `git(1)` and `xargs(1)`
+
+As might be expected this script requires the tools `sed(1)` and `git(1)`. It
+also requires the tool `xargs(1)`.
+
+### Specifying alternate paths to the tools:
+
+The script uses `type -P` to try and locate the right location but if you need
+to specify a different one you can use the options: `-s sed`, `-g git` and/or
+`-X xargs`.
+
+
+## A note about the `-i` option and backup extensions:
 
 It works like `sed -i` except that the default behaviour of the script is to use
 `-i` just with an empty backup extension (this is required for some versions of
@@ -133,7 +150,7 @@ It works like `sed -i` except that the default behaviour of the script is to use
 option .. I'm looking at you, BSD/macOS `sed`).
 
 
-## `sgit -i` WARNING: each file edited will result in another file in the working directory
+## `sgit -i` WARNING: each file edited will result in another file in the working directory:
 
 Of course if you have 50 files that are edited then 50 new files will be
 created (or otherwise updated) just like with `sed` itself.
@@ -160,7 +177,7 @@ sgit -o -n -e 's/.//g' sgit
 
 because it would empty `sgit`!
 
-## More about options and the tool itself
+## More about options and the tool itself:
 
 A man page exists for this tool with more about the tool and the options. It has
 some examples but it might be more useful to see the [Examples](#examples) in
@@ -248,7 +265,7 @@ sgit -e 's/\<sed\>/used/g' -v 1 README.md
 This might show:
 
 ```
-debug[1]: about to run: git ls-files README.md | xargs /opt/local/libexec/gnubin/sed -i"" -e s/\<sed\>/used/g
+debug[1]: about to run: /opt/local/bin/git ls-files README.md | /opt/local/libexec/gnubin/xargs /opt/local/libexec/gnubin/sed -i"" -e "s/\<sed\>/used/g"
 ```
 
 ## Verbosely (level 1) change references of `\<sed\>` to `used` in this file with a backup as `README.md.bak`
@@ -259,7 +276,7 @@ If you wish to just see the backup extension and the commands to be run, that is
 ```sh
 $ sgit -i.bak -e 's/\<sed\>/used/g' -v 1 README.md
 debug[1]: using backup extension: .bak
-debug[1]: about to run: git ls-files README.md | xargs /opt/local/libexec/gnubin/sed -i".bak" -e s/\<sed\>/used/g
+debug[1]: about to run: /opt/local/bin/git ls-files README.md | /opt/local/libexec/gnubin/xargs /opt/local/libexec/gnubin/sed -i".bak" -e "s/\<sed\>/used/g"
 ```
 
 ## Verbosely (level 2) change references of `\<sed\>` to `used` in this file with a backup as `README.md.bak`
@@ -270,10 +287,10 @@ after each glob is processed it will show the number of globs remaining:
 
 ```sh
 $ sgit -i.bak -e 's/\<sed\>/used/g' -v 2 README.md
-debug[2]: sed command: -e s/\<sed\>/used/g
+debug[2]: sed command: -e "s/\<sed\>/used/g"
 debug[1]: using backup extension: .bak
 debug[2]: found glob: 0
-debug[1]: about to run: git ls-files README.md | xargs /opt/local/libexec/gnubin/sed -i".bak" -e s/\<sed\>/used/g
+debug[1]: about to run: /opt/local/bin/git ls-files README.md | /opt/local/libexec/gnubin/xargs /opt/local/libexec/gnubin/sed -i".bak" -e "s/\<sed\>/used/g"
 ```
 
 ## Verbosely (level 2) change references of `\<sed\>` to `used` in this file with a backup as `README.md.bak` and a non-existent file
@@ -284,12 +301,12 @@ after each glob is processed it will show the number of globs remaining:
 
 ```sh
 $ sgit -i.bak -e 's/\<sed\>/used/g' -v 2 README.md foo
-debug[2]: sed command: -e s/\<sed\>/used/g
+debug[2]: sed command: -e "s/\<sed\>/used/g"
 debug[1]: using backup extension: .bak
 debug[2]: found glob: 0
-debug[1]: about to run: git ls-files README.md | xargs /opt/local/libexec/gnubin/sed -i".bak" -e s/\<sed\>/used/g
+debug[1]: about to run: /opt/local/bin/git ls-files README.md | /opt/local/libexec/gnubin/xargs /opt/local/libexec/gnubin/sed -i".bak" -e "s/\<sed\>/used/g"
 debug[2]: found glob: 1
-debug[1]: about to run: git ls-files foo | xargs /opt/local/libexec/gnubin/sed -i".bak" -e s/\<sed\>/used/g
+debug[1]: about to run: /opt/local/bin/git ls-files foo | /opt/local/libexec/gnubin/xargs /opt/local/libexec/gnubin/sed -i".bak" -e "s/\<sed\>/used/g"
 /opt/local/libexec/gnubin/sed: no input files
 ```
 
@@ -305,11 +322,11 @@ sgit -i.bak -e 's/\<sed\>/used/g' -v 3 README.md
 With the command you would see something like:
 
 ```sh
-debug[2]: sed command: -e s/\<sed\>/used/g
+debug[2]: sed command: -e "s/\<sed\>/used/g"
 debug[2]: looping through all globs
 debug[1]: using backup extension: .bak
 debug[2]: found glob: 0
-debug[1]: about to run: git ls-files README.md | xargs /opt/local/libexec/gnubin/sed -i".bak" -e s/\<sed\>/used/g
+debug[1]: about to run: /opt/local/bin/git ls-files README.md | /opt/local/libexec/gnubin/xargs /opt/local/libexec/gnubin/sed -i".bak" -e "s/\<sed\>/used/g"
 debug[2]: 0 remaining globs
 ```
 
@@ -326,11 +343,11 @@ With that you would see something like:
 
 ```sh
 $ sgit -i.bak -e 's/\<used\>/sed/g' -v3 README.md
-debug[2]: sed command: -e s/\<used\>/sed/g
+ebug[2]: sed command: -e "s/\<used\>/sed/g"
 debug[2]: looping through all globs
 debug[1]: using backup extension: .bak
 debug[2]: found glob: 0
-debug[1]: about to run: git ls-files README.md | xargs /opt/local/libexec/gnubin/sed -i".bak" -e s/\<used\>/sed/g
+debug[1]: about to run: /opt/local/bin/git ls-files README.md | /opt/local/libexec/gnubin/xargs /opt/local/libexec/gnubin/sed -i".bak" -e "s/\<used\>/sed/g"
 debug[2]: 0 remaining globs
 ```
 
@@ -412,40 +429,39 @@ command might show:
 
 ```sh
 $ sgit -v 1 -n -e 's/foo/bar/g' .
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g .gitignore
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g CHANGES.md
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g Makefile
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g README.md
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g sgit
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g sgit.1
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" ".gitignore"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "CHANGES.md"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "Makefile"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "README.md"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "sgit"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "sgit.1"
 ```
 
 If verbosity is 2 or 3 you would see respectively:
 
 ```sh
-debug[2]: sed command: -e s/foo/bar/g
+debug[2]: sed command: -e "s/foo/bar/g"
 debug[2]: found glob: 0
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g .gitignore
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g CHANGES.md
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g Makefile
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g README.md
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g sgit
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g sgit.1
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" ".gitignore"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "CHANGES.md"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "Makefile"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "README.md"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "sgit"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "sgit.1"
 ```
 
 and
 
 ```sh
-$ sgit -v 3 -n -e 's/foo/bar/g' .
-debug[2]: sed command: -e s/foo/bar/g
+debug[2]: sed command: -e "s/foo/bar/g"
 debug[2]: looping through all globs
 debug[2]: found glob: 0
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g .gitignore
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g CHANGES.md
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g Makefile
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g README.md
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g sgit
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g sgit.1
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" ".gitignore"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "CHANGES.md"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "Makefile"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "README.md"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "sgit"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "sgit.1"
 debug[2]: 0 remaining globs
 ```
 
@@ -453,27 +469,30 @@ If you were to specify more than one command you might see something like:
 
 ```sh
 $ sgit -n -v 3 -e 's/foo/bar/g' -e 's/FOO/BAR/g' .
-debug[2]: sed command: -e s/foo/bar/g
-debug[2]: sed command: -e s/FOO/BAR/g
+debug[2]: sed command: -e "s/foo/bar/g"
+debug[2]: sed command: -e "s/FOO/BAR/g"
 debug[2]: looping through all globs
 debug[2]: found glob: 0
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g .gitignore
-/opt/local/libexec/gnubin/sed -i -e s/FOO/BAR/g .gitignore
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g CHANGES.md
-/opt/local/libexec/gnubin/sed -i -e s/FOO/BAR/g CHANGES.md
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g Makefile
-/opt/local/libexec/gnubin/sed -i -e s/FOO/BAR/g Makefile
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g README.md
-/opt/local/libexec/gnubin/sed -i -e s/FOO/BAR/g README.md
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g sgit
-/opt/local/libexec/gnubin/sed -i -e s/FOO/BAR/g sgit
-/opt/local/libexec/gnubin/sed -i -e s/foo/bar/g sgit.1
-/opt/local/libexec/gnubin/sed -i -e s/FOO/BAR/g sgit.1
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" ".gitignore"
+/opt/local/libexec/gnubin/sed -i -e "s/FOO/BAR/g" ".gitignore"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "CHANGES.md"
+/opt/local/libexec/gnubin/sed -i -e "s/FOO/BAR/g" "CHANGES.md"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "Makefile"
+/opt/local/libexec/gnubin/sed -i -e "s/FOO/BAR/g" "Makefile"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "README.md"
+/opt/local/libexec/gnubin/sed -i -e "s/FOO/BAR/g" "README.md"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "sgit"
+/opt/local/libexec/gnubin/sed -i -e "s/FOO/BAR/g" "sgit"
+/opt/local/libexec/gnubin/sed -i -e "s/foo/bar/g" "sgit.1"
+/opt/local/libexec/gnubin/sed -i -e "s/FOO/BAR/g" "sgit.1"
 debug[2]: 0 remaining globs
 ```
 
 Observe how it loops through each `sed(1)` command. This is to workaround some
-versions of `sed(1)` like that of macOS (and presumably BSD).
+versions of `sed(1)` like that of macOS (and presumably BSD) that have a missing
+feature (it is no longer known what exactly though one could find it in the
+closed issues of the GitHub repo).
+
 
 ### Test `sed` command or commands without doing anything else
 
@@ -566,20 +585,23 @@ If you want to see what the options are then specify a verbosity level of 4 or
 greater:
 
 ```sh
-$ sgit -n -e 's///g' -s /usr/bin/sed -v 4 README.md sgit
+Press ENTER or type command to continue
+debug[4]: sed: /usr/bin/sed
 debug[4]: backup extension: ''
 debug[4]: in-place editing enabled
 debug[4]: test mode disabled
 debug[4]: trace mode disabled
-debug[2]: sed command: -e s///g
+debug[2]: sed command: -e "s///g"
 debug[2]: looping through all globs
 debug[2]: found glob: 0
-/usr/bin/sed -i -e s///g README.md
+/usr/bin/sed -i -e "s///g" "README.md"
 debug[2]: 1 remaining glob
 debug[2]: found glob: 1
-/usr/bin/sed -i -e s///g sgit
+/usr/bin/sed -i -e "s///g" "sgit"
 debug[2]: 0 remaining globs
 ```
+
+A similar thing might be done for `-g git` and `-X xargs` of course.
 
 ### Surround specific lines with `**` except if they end in `<br>` in which case add the `**` **BEFORE** the `<br>` at the end of the line
 
@@ -687,6 +709,13 @@ than once. Not allowing this was an oversight.
 [Landon Curt Noll](http://www.isthe.com/chongo/) provided some valuable thoughts
 and suggested the `-n` option.  This was initially added in version `0.0.14-1
 03-10-2023`. Thank you Landon!
+
+With version `1.0.0-7 11-08-2024` the options to specify a different `git` (`-g
+git`) and xargs (`-X xargs`) were added and double quotes also surround the
+`sed(1)` commands and the files in debug output (mostly useful for those who
+for some odd reason have files with spaces in their names i.e. the use of the
+`-0` option).
+
 
 ## Other thoughts
 

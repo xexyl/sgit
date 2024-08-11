@@ -10,7 +10,7 @@
 .\" prompting me to write this tool - and above all my dear Mum Dianne and my
 .\" wonderful cousin Dani.
 .\"
-.TH sgit 1 "04 January 2024" "sgit" ""
+.TH sgit 1 "11 August 2024" "sgit" ""
 .SH NAME
 .B sgit
 \- run 
@@ -34,6 +34,10 @@ control
 .IR sed_option \|]
 .RB [\| \-s
 .IR sed \|]
+.RB [\| \-g
+.IR git \|]
+.RB [\| \-X
+.IR xargs \|]
 .RB [\| \-e
 .IR command \|]
 .RB [\| \-n \|]
@@ -63,7 +67,15 @@ With the option
 .B \-s
 you can specify an alternative
 .BR sed (1)
-to use.
+and with
+.B \-g
+you can specify an alternate
+.BR git (1)
+and with
+.B \-X
+you can specify an alternate
+.BR xargs (1)
+to use, all of which are required.
 To specify
 .BR sed (1)
 options use
@@ -179,7 +191,15 @@ NOTE: if you need a space in an option you should quote it!
 .TP
 .BI \-s\  sed
 Set path to
-.BR sed (1)
+.BR sed (1).
+.TP
+.BI \-g\  git
+Set path to
+.BR git (1).
+.TP
+.BI \-X\  xargs
+Set path to
+.BR xargs (1).
 .TP
 .BI \-e\  command
 Append
