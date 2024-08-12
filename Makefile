@@ -6,6 +6,7 @@
 CHECKNR= checknr
 INSTALL= install
 MAKE= make
+RM= rm
 SHELL= bash
 SHELLCHECK= shellcheck
 
@@ -21,13 +22,17 @@ ALL_MAN_TARGETS= ${MAN1_TARGETS}
 all:
 	@:
 
-.PHONY: all install
+.PHONY: all install uninstall
 
 install:
 	${INSTALL} -d -m 0775 ${DESTDIR}
 	${INSTALL} -d -m 0775 ${MAN1_DIR}
 	${INSTALL} -m 0755 ${TARGETS} ${DESTDIR}
 	${INSTALL} -m 0444 ${MAN1_TARGETS} ${MAN1_DIR}
+
+uninstall:
+	${RM} -vf ${DESTDIR}/sgit
+	${RM} -vf ${MAN1_DIR}/sgit.1
 
 shellcheck: sgit
 	@${SHELLCHECK} sgit
