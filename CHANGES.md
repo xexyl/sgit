@@ -1,3 +1,26 @@
+# Version 1.0.0-7 11-08-2024
+
+New options and debug output improvements
+
+The option `-g git` allows one to specify a git path.
+
+The option `-X xargs` allows one to specify an xargs path.
+
+The git and xargs commands are now in variables ($GIT and $XARGS
+respectively).
+
+When showing debug output filenames are double quoted (in case one has
+spaces in filenames, unsafe though it is) and the same for the sed
+commands (as it can be misleading otherwise especially if there are
+spaces in a sed command).
+
+
+# Versions in between the below and the above
+
+Unfortunately I forgot that I had this file so one will have to check the git
+log as I deem it not that important to try and rectify.
+
+
 # Version 1.0.0-1 06-10-2023
 
 Add `-t` option to test each `sed` command specified. This option does not make
