@@ -1,5 +1,6 @@
 # sgit .gitignore file
 *.bak
 *.bku
+.*.sw[a-z]
 readme.html
 README.html
