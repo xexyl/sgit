@@ -22,7 +22,13 @@ ALL_MAN_TARGETS= ${MAN1_TARGETS}
 all:
 	@:
 
-.PHONY: all install uninstall
+.PHONY: all clean clobber install uninstall
+
+clean:
+	@:
+
+clobber: clean
+	@:
 
 install:
 	${INSTALL} -d -m 0775 ${DESTDIR}
