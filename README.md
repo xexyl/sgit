@@ -694,11 +694,25 @@ can just run `make install` either as root or via `sudo` like:
 sudo make install
 ```
 
+## Uninstalling
+
+If you need to uninstall the tool you can do so with the `make uninstall` rule
+either directly as root or sudo:
+
+```sh
+sudo make uninstall
+```
+
+This will remove the man page from the man page directory and sgit from the bin
+directory.
+
+
 ## Limitations
 
 If you specify invalid `sed` commands obviously there will be problems. If you
 specify invalid `sed` options there will possibly be problems as well. As noted
 earlier you can test the `sed` commands.
+
 
 ## Bugs
 
