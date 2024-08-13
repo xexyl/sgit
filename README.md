@@ -682,6 +682,46 @@ sgit -e 's,/opt/local/libexec/gnubin/\(sed\|xargs\),/usr/bin/\1,g' -e 's,/opt/lo
 This shows the capture of the command names (basenames) and changes their paths
 (dirname) entirely to be `/usr/bin`.
 
+### Make Entings
+
+<hr>
+Disclaimer: okay this is mostly a joke but as it still shows another use of the
+tool I have put it in.
+<hr>
+
+By accident (I did not even realise all the options were there that spell the
+word [ent](https://www.glyphweb.com/arda/e/ents.html)) the `getopts` line in the
+script spells out `ent` like:
+
+```
+e:nt
+```
+
+There are no [entings](https://www.glyphweb.com/arda/e/entings.html) (young
+Ents) in centuries due to no more
+[Entwives](https://www.glyphweb.com/arda/e/entwives.html) but let's help the
+Ents out a bit, shall we? :-)
+
+This changes the `e:nt` to `entings` (all of the options do exist but we can't
+duplicate the `n` so no way to have `enting` sadly, otherwise I assure you that
+it would spell it out):
+
+```sh
+sgit -I -e 's/e:nt/entings/g' sgit | grep entings
+```
+
+That would show the following:
+
+```sh
+while getopts :hVv:xIi:o:s:g:X:entings0 flag; do
+```
+
+(Of course even if we could duplicate the `n` it would be invalid as the other
+options exist earlier in the `getopts` and we do not have the required `:` for
+the ones that need it. But as this is just a joke and we disable in-place
+editing it does not matter.)
+
+
 
 ## Installing
 
