@@ -117,7 +117,7 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension]
 				NOTE: this does not check if your xargs has -0
 
 
-sgit version: 1.0.0-7 11-08-2024
+sgit version: 1.0.0-8 30-08-2024
 ```
 
 You **MUST** specify at least one `sed` command and if the `-t` option is not
@@ -281,9 +281,9 @@ debug[1]: about to run: /usr/bin/git ls-files README.md | /usr/bin/xargs /usr/bi
 
 ## Verbosely (level 2) change references of `\<sed\>` to `used` in this file with a backup as `README.md.bak`
 
-With verbosity level 2 the above command, with the added glob that does not
-exist (`foo`), it will show the `sed(1)` commands (or in this case command) and
-after each glob is processed it will show the number of globs remaining:
+With verbosity level 2 the above command, it will show the `sed(1)` commands (or
+in this case command) and after each glob is processed it will show the glob
+number and the number of globs remaining (assuming there is more than one):
 
 ```sh
 $ sgit -i.bak -e 's/\<sed\>/used/g' -v 2 README.md
@@ -292,6 +292,10 @@ debug[1]: using backup extension: .bak
 debug[2]: found glob: 0
 debug[1]: about to run: /usr/bin/git ls-files README.md | /usr/bin/xargs /usr/bin/sed -i".bak" -e "s/\<sed\>/used/g"
 ```
+
+As there is only one glob it does not report there is another glob to go
+through.
+
 
 ## Verbosely (level 2) change references of `\<sed\>` to `used` in this file with a backup as `README.md.bak` and a non-existent file
 
@@ -306,9 +310,17 @@ debug[1]: using backup extension: .bak
 debug[2]: found glob: 0
 debug[1]: about to run: /usr/bin/git ls-files README.md | /usr/bin/xargs /usr/bin/sed -i".bak" -e "s/\<sed\>/used/g"
 debug[2]: found glob: 1
-debug[1]: about to run: /usr/bin/git ls-files foo | /usr/bin/xargs /usr/bin/sed -i".bak" -e "s/\<sed\>/used/g"
-/usr/bin/sed: no input files
+debug[2]: no files found with glob: "foo"
+debug[2]: hint: do you need to use -0?
 ```
+
+Here you observe that since no files were found for `foo` it reports this. If
+you did not specify a verbosity level of 2 or greater then this will not be seen
+as globs are not shown. In this case also it offers the hint that maybe one
+needs the `-0` option to `sgit(1)` to use `git ls-files -z` though as noted
+elsewhere, this is untested as I do not have access to any repo that has unsafe
+characters in filenames.
+
 
 ## Verbosely (level 3) change references of `\<sed\>` to `used` in this file with a backup as `README.md.bak`
 

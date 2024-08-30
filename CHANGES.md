@@ -1,3 +1,8 @@
+# Version 1.0.0-8 29-08-2024
+
+Fix bug that showed up if a glob did not find any file in the repo.
+
+
 # Version 1.0.0-7 11-08-2024
 
 New options and debug output improvements
