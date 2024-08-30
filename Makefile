@@ -45,9 +45,8 @@ shellcheck: sgit
 	@${SHELLCHECK} sgit
 	@echo "shellcheck found no problems."
 
-test:
-	${MAKE} check_man
-	${MAKE} shellcheck
+test: check_man shellcheck
+	@:
 
 check_man: ${ALL_MAN_TARGETS}
 	@if ! type -P ${CHECKNR} >/dev/null 2>&1; then \
