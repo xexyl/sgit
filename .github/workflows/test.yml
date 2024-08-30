@@ -17,5 +17,6 @@ jobs:
     - name: clone checknr
       run: git clone https://github.com/lcn2/checknr.git
     - name: install checknr
+      run: cd checknr && sudo make install
     - name: run make test
       run: make test
