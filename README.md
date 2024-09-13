@@ -67,7 +67,7 @@ rest of the options.
 See the section [Script history](#script-history) for more details on the
 evolution of the script.
 
-## Usage
+# Usage
 
 ```sh
 usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension]
@@ -130,19 +130,19 @@ Note that although in some cases it is possible to specify more than one command
 with just one `-e` option it can end up resulting in a `sed` error so it is
 recommended that you use `-e` for each command.
 
-## Required tools: `sed(1)`, `git(1)` and `xargs(1)`
+# Required tools: `sed(1)`, `git(1)` and `xargs(1)`
 
 As might be expected this script requires the tools `sed(1)` and `git(1)`. It
 also requires the tool `xargs(1)`.
 
-### Specifying alternate paths to the tools:
+## Specifying alternate paths to the tools:
 
 The script uses `type -P` to try and locate the right location but if you need
 to specify a different one you can use the options: `-s sed`, `-g git` and/or
 `-X xargs`.
 
 
-## A note about the `-i` option and backup extensions:
+# A note about the `-i` option and backup extensions:
 
 It works like `sed -i` except that the default behaviour of the script is to use
 `-i` just with an empty backup extension (this is required for some versions of
@@ -150,7 +150,7 @@ It works like `sed -i` except that the default behaviour of the script is to use
 option .. I'm looking at you, BSD/macOS `sed`).
 
 
-## `sgit -i` WARNING: each file edited will result in another file in the working directory:
+# `sgit -i` WARNING: each file edited will result in another file in the working directory:
 
 Of course if you have 50 files that are edited then 50 new files will be
 created (or otherwise updated) just like with `sed` itself.
@@ -177,7 +177,7 @@ sgit -o -n -e 's/.//g' sgit
 
 because it would empty `sgit`!
 
-## More about options and the tool itself:
+# More about options and the tool itself:
 
 A man page exists for this tool with more about the tool and the options. It has
 some examples but it might be more useful to see the [Examples](#examples) in
@@ -197,9 +197,9 @@ Of course since this tool must be run in a `git(1)` repo it's not very useful if
 it's not installed. See [Installing](#installing) for how to install this tool.
 
 
-## Examples
+# Examples
 
-### Delete first variable number of lines up through but excluding a matching line
+## Delete first variable number of lines up through but excluding a matching line
 
 In the [IOCCC temporary website](https://github.com/ioccc-src/temp-test-ioccc)
 repo I had to delete the first lines up through the '## To build:' lines
@@ -223,13 +223,13 @@ of time and prevented very tedious work. As you can see, this tool is very
 useful.
 
 
-### Change references (**IN MEMORY ONLY** i.e. **WITHOUT in-place editing**) of the exact word `sed` (as in `\<sed\>`) in this file but only show changed lines
+## Change references (**IN MEMORY ONLY** i.e. **WITHOUT in-place editing**) of the exact word `sed` (as in `\<sed\>`) in this file but only show changed lines
 
 ```sh
 sgit -I -o -n -e 's/\<sed\>/used/p' README.md
 ```
 
-### Print out matches of the EXACT word `sed` (as in `\<sed\>`) in all files under git control from the current working directory
+## Print out matches of the EXACT word `sed` (as in `\<sed\>`) in all files under git control from the current working directory
 
 This is a simpler way of running `git --no-pager grep -h -E '\<sed\>'|sed
 's/^[0-9]*://g'` which itself might or might not be more complicated than it
@@ -239,14 +239,14 @@ needs to be:
 sgit -I -o -n -e '/\<sed\>/p' .
 ```
 
-### With tracing enabled, change references of `\<sed\>` to `used` in this file and save it:
+## With tracing enabled, change references of `\<sed\>` to `used` in this file and save it:
 
 ```sh
 sgit -e 's/\<sed\>/used/g' -x README.md
 ```
 
 
-### With tracing enabled, change references of `\<sed\>` to `used`, duplicating the lines, in this file and save it:
+## With tracing enabled, change references of `\<sed\>` to `used`, duplicating the lines, in this file and save it:
 
 ```sh
 sgit -e 's/\<sed\>/used/p' -x README.md
@@ -324,8 +324,7 @@ characters in filenames.
 
 ## Verbosely (level 3) change references of `\<sed\>` to `used` in this file with a backup as `README.md.bak`
 
-
-With verbosity of level 3 it will show more information.
+With verbosity of level 3 it will show even more information.
 
 ```sh
 sgit -i.bak -e 's/\<sed\>/used/g' -v 3 README.md
@@ -345,7 +344,7 @@ debug[2]: 0 remaining globs
 Level 1 will not show how many globs remain after each operation.
 
 
-### Verbosely (level 3) change references of `\<used\>` back to `sed` in this file with a backup as `README.md.bak`
+## Verbosely (level 3) change references of `\<used\>` back to `sed` in this file with a backup as `README.md.bak`
 
 ```sh
 sgit -i.bak -e 's/\<used\>/sed/g' -v 3 README.md
@@ -384,20 +383,20 @@ sgit -e '1s/\<sed\>/u&/g' README.md
 sgit -e '1s/\(\<sed\>\)/u\1/g' README.md
 ```
 
-### Change `\<sgit\>` to `gits` but only if it's on the third line
+## Change `\<sgit\>` to `gits` but only if it's on the third line
 
 ```sh
 sgit -e '3s/\<sgit\>/gits/g' README.md
 ```
 
-### Change `\<sgit\>` to `gits` and then back to `sgit` but only if it's on the third line
+## Change `\<sgit\>` to `gits` and then back to `sgit` but only if it's on the third line
 
 
 ```sh
 sgit -e '3s/\<sgit\>/gits/g' -e '3s/\<gits\>/sgit/g' README.md
 ```
 
-### Dry-run mode: **ONLY _SHOW_** files that would be modified rather than modify them
+## Dry-run mode: **ONLY _SHOW_** files that would be modified rather than modify them
 
 If you want to **ONLY _SEE_ FILES** that would be considered **WITHOUT
 _touching_** them you can use the `-n` option like so:
@@ -422,10 +421,10 @@ sgit
 sgit.1
 ```
 
-NOTE: it is pointless to supply a `sed(1)` command in this case but you may do
+**NOTE**: it is pointless to supply a `sed(1)` command in this case but you may do
 so anyway; it is not required.
 
-### Dry-run mode: **ONLY _SHOW_** sed commands with the files found rather than actually running sed on them
+## Dry-run mode: **ONLY _SHOW_** sed commands with the files found rather than actually running sed on them
 
 If you want to see the `sed(1)` command along with the files found **WITHOUT
 _touching_** them you can use the `-n` option with a verbosity level greater
@@ -502,11 +501,10 @@ debug[2]: 0 remaining globs
 
 Observe how it loops through each `sed(1)` command. This is to workaround some
 versions of `sed(1)` like that of macOS (and presumably BSD) that have a missing
-feature (it is no longer known what exactly though one could find it in the
-closed issues of the GitHub repo).
+feature (it is no longer known what exactly that feature).
 
 
-### Test `sed` command or commands without doing anything else
+## Test `sed` command or commands without doing anything else
 
 If you want to verify that there is no syntax error in the `sed` commands you
 can do so with the `-t` option. If there is an error in syntax the error message
@@ -591,7 +589,7 @@ $ sgit -t -e 's/e/c' -e 's/e/c/g' -e 's///'
 
 which of course is not all that useful.
 
-### Show `sed(1)` path and options used along with just the files that would be acted on (dry-mode)
+## Show `sed(1)` path and options used along with just the files that would be acted on (dry-mode)
 
 If you want to see what the options are then specify a verbosity level of 4 or
 greater:
@@ -613,7 +611,7 @@ debug[2]: 0 remaining globs
 ```
 
 
-### Surround specific lines with `**` except if they end in `<br>` in which case add the `**` **BEFORE** the `<br>` at the end of the line
+## Surround specific lines with `**` except if they end in `<br>` in which case add the `**` **BEFORE** the `<br>` at the end of the line
 
 In the [IOCCC temporary website](https://github.com/ioccc-src/temp-test-ioccc)
 repo we had code blocks of the form:
@@ -668,7 +666,7 @@ A caveat here, of course, is that I did this in steps (in order to document),
 but the idea is here anyway.
 
 
-### Changing the paths of tools in a file
+## Changing the paths of tools in a file
 
 Previously for output in examples I used non-standard paths for macOS (because
 of MacPorts). This meant this file had paths like:
@@ -694,7 +692,7 @@ sgit -e 's,/opt/local/libexec/gnubin/\(sed\|xargs\),/usr/bin/\1,g' -e 's,/opt/lo
 This shows the capture of the command names (basenames) and changes their paths
 (dirname) entirely to be `/usr/bin`.
 
-### Make Entings
+## Make Entings
 
 <hr>
 Disclaimer: okay this is mostly a joke but as it still shows another use of the
@@ -702,14 +700,14 @@ tool I have put it in.
 <hr>
 
 By accident (I did not even realise all the options were there that spell the
-word [ent](https://www.glyphweb.com/arda/e/ents.html)) the `getopts` line in the
-script spells out `ent` like:
+word [ent](https://www.glyphweb.com/arda/e/ents.html)) in the `getopts` line in
+the script spells out `ent` like:
 
 ```
 e:nt
 ```
 
-There are no [entings](https://www.glyphweb.com/arda/e/entings.html) (young
+There are no [Entings](https://www.glyphweb.com/arda/e/entings.html) (young
 Ents) in centuries due to no more
 [Entwives](https://www.glyphweb.com/arda/e/entwives.html) but let's help the
 Ents out a bit, shall we? :-)
@@ -735,7 +733,7 @@ editing it does not matter.)
 
 
 
-## Installing
+# Installing
 
 If you wish to install it (which would be useful since you must run the script
 in a git repo and the odds are you won't be running it in this repo :-) )  you
@@ -746,7 +744,17 @@ can just run `make install` either as root or via `sudo` like:
 sudo make install
 ```
 
-## Uninstalling
+If for some reason, for instance system policy, you do not wish to install to
+`/usr/local`, you can override this with the standard `PREFIX` variable. For
+instance, to make the `PREFIX` `/usr` so the `sgit` is installed in
+`/usr/bin/sgit` and the man page, `sgit.1`, is installed in
+`/usr/share/man/man1`, do:
+
+```sh
+sudo make PREFIX=/usr install
+```
+
+# Uninstalling
 
 If you need to uninstall the tool you can do so with the `make uninstall` rule
 either directly as root or sudo:
@@ -758,19 +766,22 @@ sudo make uninstall
 This will remove the man page from the man page directory and sgit from the bin
 directory.
 
+Remember that if you have redefined the `PREFIX` as described above that you
+will have to specify that same `PREFIX`!
 
-## Limitations
+
+# Limitations
 
 If you specify invalid `sed` commands obviously there will be problems. If you
 specify invalid `sed` options there will possibly be problems as well. As noted
 earlier you can test the `sed` commands.
 
 
-## Bugs
+# Bugs
 
 None known (yet?).
 
-## Inspiration and historical context of `sgit`
+# Inspiration and historical context of `sgit`
 
 It has been a persistent problem for me that I need to edit files under git
 control and `sed` is the obvious way to go about it.
@@ -782,7 +793,7 @@ about it. The latter repo will eventually be merged into the [IOCCC winner
 repo](https://github.com/ioccc-src/winner) which is the actual [IOCCC
 website](https://www.ioccc.org).
 
-### Script history
+# Script history
 
 This was originally a quick and dirty hack to modify files under git control via
 `sed`. It started out with some limitations like the inability to deal with
@@ -808,12 +819,12 @@ for some odd reason have files with spaces in their names i.e. the use of the
 `-0` option).
 
 
-## Other thoughts
+# Other thoughts
 
 Pull requests are welcome but I think it's mostly in a good enough state where
 this will probably generally not be needed.
 
-## Dedications and thanks
+# Dedications and thanks
 
 This is dedicated to the [IOCCC](https://www.ioccc.org), the [IOCCC
 judges](https://www.ioccc.org/judges.html) especially ([Landon Curt
