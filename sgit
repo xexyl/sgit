@@ -33,7 +33,7 @@
 # - Cody Boone Ferguson (@xexyl)
 #
 
-export SGIT_VERSION="1.0.0-8 30-08-2024" # format: major.minor.patch-release DD-MM-YYYY
+export SGIT_VERSION="1.0.1 30-08-2024" # format: major.minor.patch-release DD-MM-YYYY
 
 USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension]
 	    [-o sed_option] [-s sed] [-g git] [-X xargs]
@@ -106,8 +106,12 @@ export TRACE_MODE=""
 export ZERO_FLAG=
 
 
+# unset SED_COMMANDS first
+unset SED_COMMANDS
 # we need an array for sed commands
 declare -a SED_COMMANDS
+# unset SED_OPTIONS first
+unset SED_OPTIONS
 # we need an array for sed options
 declare -a SED_OPTIONS
 
