@@ -61,7 +61,7 @@ RM_V=
 all:
 	@:
 
-.PHONY: all clean clobber install uninstall test check_man
+.PHONY: all clean clobber install uninstall shellcheck check_man test
 
 clean:
 	@:
@@ -120,8 +120,6 @@ shellcheck: ${SGIT} .shellcheckrc
 	@echo
 	@echo "${OUR_NAME}: make $@ ending"
 
-test: check_man shellcheck
-	@:
 
 check_man: ${ALL_MAN_TARGETS}
 	@echo
@@ -142,3 +140,6 @@ check_man: ${ALL_MAN_TARGETS}
 	fi
 	@echo
 	@echo "${OUR_NAME}: make $@ ending"
+
+test: shellcheck check_man
+	@:

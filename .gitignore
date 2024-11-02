@@ -2,5 +2,6 @@
 *.bak
 *.bku
 .*.sw[a-z]
+/.github/workflows/codeql.yml
 readme.html
 README.html
