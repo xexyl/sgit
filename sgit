@@ -33,9 +33,11 @@
 # - Cody Boone Ferguson (@xexyl)
 #
 
-export SGIT_VERSION="1.0.1 30-08-2024" # format: major.minor.patch-release DD-MM-YYYY
+export SGIT_VERSION="1.0.2 02-11-2024" # format: major.minor.patch-release DD-MM-YYYY
+SGIT=$(basename "$0")
+export SGIT
 
-USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension]
+USAGE="usage: $SGIT [-h] [-V] [-v level] [-x] [-I] [-i extension]
 	    [-o sed_option] [-s sed] [-g git] [-X xargs]
 	    [-e command] [-n] [-t] [-0] <glob...>
 
@@ -50,7 +52,7 @@ USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension]
 				WARNING: this will create or update a file for each file changed
 
     -o sed_option	    append sed option to options list
-				WARNING: use of 'sgit -o -n' without 'sgit -I', can depending on
+				WARNING: use of \"$SGIT -o -n\" without \"$SGIT -I\" can, depending on
 				sed commands, empty files as if both 'sed -i' and 'sed -n' were
 				used together
 
@@ -69,20 +71,20 @@ USAGE="usage: $(basename "$0") [-h] [-V] [-v level] [-x] [-I] [-i extension]
     -n			    dry-run: don't run sed, only show files or sed commands with files
 
 				NOTE: if verbosity is > 1 (-v 2)  we show the sed commands along with any sed
-				options (if sgit -o used) and the files found; otherwise we only show
+				options (if \"$SGIT -o\" used) and the files found; otherwise we only show
 				the files found.
-				NOTE: use of sgit -n prevents sed commands from being run
+				NOTE: use of \"$SGIT -n\" prevents sed commands from being run
 
     -t			    test sed commands and exit
 
-				NOTE: this does NOT test sed options (sgit -o)
+				NOTE: this does NOT test sed options (\"$SGIT\" -o)
 
     -0			    Use git ls-files -z and xargs -0
 
 				NOTE: this does not check if your xargs has -0
 
 
-sgit version: $SGIT_VERSION"
+$SGIT version: $SGIT_VERSION"
 
 # We must make sure we have the tools installed and that they are executable.
 # This is important in case the user overrides the paths OR if the any of the

@@ -85,7 +85,7 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension]
 				WARNING: this will create or update a file for each file changed
 
     -o sed_option	    append sed option to options list
-				WARNING: use of 'sgit -o -n' without 'sgit -I', can depending on
+				WARNING: use of "sgit -o -n" without "sgit -I" can, depending on
 				sed commands, empty files as if both 'sed -i' and 'sed -n' were
 				used together
 
@@ -104,19 +104,20 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension]
     -n			    dry-run: don't run sed, only show files or sed commands with files
 
 				NOTE: if verbosity is > 1 (-v 2)  we show the sed commands along with any sed
-				options (if sgit -o used) and the files found; otherwise we only show
+				options (if "sgit -o" used) and the files found; otherwise we only show
 				the files found.
-				NOTE: use of sgit -n prevents sed commands from being run
+				NOTE: use of "sgit -n" prevents sed commands from being run
 
     -t			    test sed commands and exit
 
-				NOTE: this does NOT test sed options (sgit -o)
+				NOTE: this does NOT test sed options ("sgit" -o)
 
     -0			    Use git ls-files -z and xargs -0
 
 				NOTE: this does not check if your xargs has -0
 
-sgit version: 1.0.1 30-08-2024
+
+sgit version: 1.0.2 02-11-2024
 ```
 
 You **MUST** specify at least one `sed` command and if the `-t` option is not
