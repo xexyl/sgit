@@ -2,18 +2,12 @@ name: "CodeQL Advanced"
 on:
   push:
     branches: [ "master" ]
-    paths:
-        - '**/*.sh'
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "master" ]
-    paths:
-        - '**/*.sh'
-  # Manual trigger from Actions
+
   workflow_dispatch:
     branches: [ "master" ]
-    paths: 
-        - '**/*.sh' 
   schedule: 
     - cron: '18 15 * * 5'
 
