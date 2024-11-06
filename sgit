@@ -33,7 +33,7 @@
 # - Cody Boone Ferguson (@xexyl)
 #
 
-export SGIT_VERSION="1.0.2 02-11-2024" # format: major.minor.patch-release DD-MM-YYYY
+export SGIT_VERSION="1.0.3 06-11-2024" # format: major.minor.patch-release DD-MM-YYYY
 SGIT=$(basename "$0")
 export SGIT
 
@@ -389,25 +389,39 @@ while [[ "$i" -lt "$GLOBS" ]]; do
 		# if sed options were specified (sgit -o was used) we need to show
 		# the options along with the commands to be run on the files found.
 		if [[ -n "$SED_OPTIONS" ]]; then
-		    for cmd in "${SED_COMMANDS[@]}"; do
-			# check if we should use -z and xargs -0
-			if [[ -n "$ZERO_FLAG" ]]; then
-			    echo "debug[1]: about to run: $GIT ls-files -z $1 | $XARGS -0 $SED -i\"$EXTENSION\" ${SED_OPTIONS[*]} -e \"$cmd\"" 1>&2
-			else
-			    echo "debug[1]: about to run: $GIT ls-files $1 | $XARGS $SED -i\"$EXTENSION\" ${SED_OPTIONS[*]} -e \"$cmd\"" 1>&2
-			fi
-		    done
+                    if [[ -z "$ZERO_FLAG" ]]; then
+                        while read -r f; do
+                            for cmd in "${SED_COMMANDS[@]}"; do
+                                if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                                    echo "debug[1]: about to run: $SED -i\"$EXTENSION\" ${SED_OPTIONS[*]} -e \"$cmd\"" "$f" 1>&2
+                                fi
+                            done
+                        done < <("$GIT" ls-files "$1")
+                    else
+                         while read -r f; do
+                            for cmd in "${SED_COMMANDS[@]}"; do
+                                echo "debug[1]: about to run: $SED -i\"$EXTENSION\" ${SED_OPTIONS[*]} -e \"$cmd\"" "$f" 1>&2
+                            done
+                        done < <("$GIT" ls-files -z "$1")
+                    fi
 
 		# if, however, sed options were not used (sgit -o NOT used) we only show the
 		# sed commands to be run on the files found.
 		else
 		    for cmd in "${SED_COMMANDS[@]}"; do
-			# check if we should use -z and xargs -0
-			if [[ "$ZERO_FLAG" ]]; then
-			    echo "debug[1]: about to run: $GIT ls-files -z $1 | $XARGS -0 $SED -i\"$EXTENSION\" -e \"$cmd\"" 1>&2
-			else
-			    echo "debug[1]: about to run: $GIT ls-files $1 | $XARGS $SED -i\"$EXTENSION\" -e \"$cmd\"" 1>&2
-			fi
+                        if [[ -z "$ZERO_FLAG" ]]; then
+                            while read -r f; do
+                                if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                                    echo "debug[1]: about to run: $SED -i\"$EXTENSION\" -e \"$cmd\"" "$f" 1>&2
+                                fi
+                            done < <("$GIT" ls-files "$1")
+                        else
+                            while read -r f; do
+                                if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                                    echo "debug[1]: about to run: $SED -i\"$EXTENSION\" -e \"$cmd\"" "$f" 1>&2
+                                fi
+                            done < <("$GIT" ls-files -z "$1")
+                        fi
 		    done
 		fi
 	    # otherwise, if we're not to do in place editing (i.e. sgit -I used),
@@ -417,24 +431,40 @@ while [[ "$i" -lt "$GLOBS" ]]; do
 		# if sed options specified (sgit -o) we show the sed command with
 		# options run on any files found.
 		if [[ -n "$SED_OPTIONS" ]]; then
-		    for cmd in "${SED_COMMANDS[@]}"; do
-			# check for -0
-			if [[ -n "$ZERO_FLAG" ]]; then
-			    echo "debug[1]: about to run: $GIT ls-files -z $1 | $XARGS -0 $SED ${SED_OPTIONS[*]} -e \"$cmd\"" 1>&2
-			else
-			    echo "debug[1]: about to run: $GIT ls-files $1 | $XARGS $SED ${SED_OPTIONS[*]} -e \"$cmd\"" 1>&2
-			fi
-		    done
+                    if [[ -z "$ZERO_FLAG" ]]; then
+                        while read -r f; do
+                            for cmd in "${SED_COMMANDS[@]}"; do
+                                if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                                    echo "debug[1]: about to run: $SED ${SED_OPTIONS[*]} -e \"$cmd\"" "$f" 1>&2
+                                fi
+                            done
+                        done < <("$GIT" ls-files "$1")
+                    else
+                        while read -r f; do
+                            for cmd in "${SED_COMMANDS[@]}"; do
+                                if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                                    echo "debug[1]: about to run: $SED ${SED_OPTIONS[*]} -e \"$cmd\"" "$f" 1>&2
+                                fi
+                            done
+                        done < <("$GIT" ls-files -z "$1")
+                    fi
 		# otherwise, if sed options not specified (sgit -o NOT used), we have to show
 		# just the sed command on the files found.
 		else
 		    for cmd in "${SED_COMMANDS[@]}"; do
-			# check for -0
-			if [[ -n "$ZERO_FLAG" ]]; then
-			    echo "debug[1]: about to run: $GIT ls-files -z $1 | $XARGS -0 $SED -e \"$cmd\"" 1>&2
-			else
-			    echo "debug[1]: about to run: $GIT ls-files $1 | $XARGS $SED -e \"$cmd\"" 1>&2
-			fi
+                        if [[ -z "$ZERO_FLAG" ]]; then
+                            while read -r f; do
+                                if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                                    echo "debug[1]: about to run: $SED -e \"$cmd\"" "$f" 1>&2
+                                fi
+                            done < <("$GIT" ls-files "$1")
+                        else
+                            while read -r f; do
+                                if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                                    echo "debug[1]: about to run: $SED -e \"$cmd\"" "$f" 1>&2
+                                fi
+                            done < <("$GIT" ls-files -z"$1")
+                        fi
 		    done
 		fi
 	    fi
@@ -451,37 +481,77 @@ while [[ "$i" -lt "$GLOBS" ]]; do
 	    # complete
 	    if [[ -n "$SED_OPTIONS" ]]; then
 		# sgit -o used: we have sed options
-		for f in $("$GIT" ls-files "$1" | "$XARGS"); do
-		    if [[ "$VERBOSITY" -ge 1 && -n "${SED_COMMANDS[*]}" ]]; then
-			# verbosity is high enough: we have sed options so show the
-			# full sed command
-			for cmd in "${SED_COMMANDS[@]}"; do
-			    echo "debug[1]: $SED" -i"$EXTENSION" "${SED_OPTIONS[*]}" -e \""$cmd"\" \""$f"\" 1>&2
-			done
-		    else
-			# here verbosity is not high enough (< 1) so we just show
-			# the files that sed would run on without the -n option
-			echo "$f" 1>&2
-		    fi
-		done
+                if [[ -z "$ZERO_FLAG" ]]; then
+                    while read -r f; do
+                        if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                            if [[ "$VERBOSITY" -ge 1 && -n "${SED_COMMANDS[*]}" ]]; then
+                                # verbosity is high enough: we have sed options so show the
+                                # full sed command
+                                for cmd in "${SED_COMMANDS[@]}"; do
+                                    echo "debug[1]: $SED" -i"$EXTENSION" "${SED_OPTIONS[*]}" -e \""$cmd"\" \""$f"\" 1>&2
+                                done
+                            else
+                                # here verbosity is not high enough (< 1) so we just show
+                                # the files that sed would run on without the -n option
+                                echo "$f" 1>&2
+                            fi
+                        fi
+                    done < <("$GIT" ls-files "$1")
+                else
+                    while read -r f; do
+                        if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                            if [[ "$VERBOSITY" -ge 1 && -n "${SED_COMMANDS[*]}" ]]; then
+                                # verbosity is high enough: we have sed options so show the
+                                # full sed command
+                                for cmd in "${SED_COMMANDS[@]}"; do
+                                    echo "debug[1]: $SED" -i"$EXTENSION" "${SED_OPTIONS[*]}" -e \""$cmd"\" \""$f"\" 1>&2
+                                done
+                            else
+                                # here verbosity is not high enough (< 1) so we just show
+                                # the files that sed would run on without the -n option
+                                echo "$f" 1>&2
+                            fi
+                        fi
+                    done < <("$GIT" ls-files -z "$1")
+                fi
+
 
 	    # otherwise, if we reach this else, we know that there are no sed options
 	    # so we show either sed commands in full (with file) or just the files,
 	    # depending on the verbosity
 	    else
 		# for each file found with the current glob...
-		for f in $("$GIT" ls-files "$1"); do
-		    if [[ "$VERBOSITY" -ge 1 && -n "${SED_COMMANDS[*]}" ]]; then
-			# verbosity is high enough so we show the sed commands with
-			# the files found for this glob
-			for cmd in "${SED_COMMANDS[@]}"; do
-			    echo "$SED" -i"$EXTENSION" -e \""$cmd"\" \""$f"\" 1>&2
-			done
-		    else
-			# here we just show the files that would be acted on
-			echo "$f" 1>&2
-		    fi
-		done
+                if [[ -z "$ZERO_FLAG" ]]; then
+                    while read -r f; do
+                        if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                            if [[ "$VERBOSITY" -ge 1 && -n "${SED_COMMANDS[*]}" ]]; then
+                                # verbosity is high enough so we show the sed commands with
+                                # the files found for this glob
+                                for cmd in "${SED_COMMANDS[@]}"; do
+                                    echo "$SED" -i"$EXTENSION" -e \""$cmd"\" \""$f"\" 1>&2
+                                done
+                            else
+                                # here we just show the files that would be acted on
+                                echo "$f" 1>&2
+                            fi
+                        fi
+                    done < <("$GIT" ls-files "$1")
+                else
+                    while read -r f; do
+                        if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                            if [[ "$VERBOSITY" -ge 1 && -n "${SED_COMMANDS[*]}" ]]; then
+                                # verbosity is high enough so we show the sed commands with
+                                # the files found for this glob
+                                for cmd in "${SED_COMMANDS[@]}"; do
+                                    echo "$SED" -i"$EXTENSION" -e \""$cmd"\" \""$f"\" 1>&2
+                                done
+                            else
+                                # here we just show the files that would be acted on
+                                echo "$f" 1>&2
+                            fi
+                        fi
+                    done < <("$GIT" ls-files -z "$1")
+                fi
 	    fi
 	# here we can actually run commands!
 	elif [[ -z "$I_FLAG" ]]; then
@@ -492,28 +562,44 @@ while [[ "$i" -lt "$GLOBS" ]]; do
 		# options specified, on the files found
 
 		# check if -0 used
-		if [[ -n "$ZERO_FLAG" ]]; then
-		    for cmd in "${SED_COMMANDS[@]}"; do
-			"$GIT" ls-files -z "$1" | "$XARGS" -0 "$SED" -i"$EXTENSION" "${SED_OPTIONS[*]}" -e "$cmd"
-		    done
+                if [[ -z "$ZERO_FLAG" ]]; then
+                    while read -r f; do
+                        if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                            for cmd in "${SED_COMMANDS[@]}"; do
+                                "$SED" -i"$EXTENSION" "${SED_OPTIONS[*]}" -e "$cmd" "$f"
+                            done
+                        fi
+                    done < <("$GIT" ls-files "$1")
 		else
-		    for cmd in "${SED_COMMANDS[@]}"; do
-			"$GIT" ls-files "$1" | "$XARGS" "$SED" -i"$EXTENSION" "${SED_OPTIONS[*]}" -e "$cmd"
-		    done
+                    while read -r f; do
+                        if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                            for cmd in "${SED_COMMANDS[@]}"; do
+                                "$SED" -i"$EXTENSION" "${SED_OPTIONS[*]}" -e "$cmd" "$f"
+                            done
+                        fi
+                    done < <("$GIT" ls-files -z "$1")
 		fi
 	    else
 		# we don't have any sed options (sgit -o NOT used) so just run the sed
 		# commands with the extension (default empty)
 
 		# check if -0 used
-		if [[ -n "$ZERO_FLAG" ]]; then
-		    for cmd in "${SED_COMMANDS[@]}"; do
-			"$GIT" ls-files -z "$1" | "$XARGS" -0 "$SED" -i"$EXTENSION" -e "$cmd"
-		    done
+		if [[ -z "$ZERO_FLAG" ]]; then
+                    while read -r f; do
+                        if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                            for cmd in "${SED_COMMANDS[@]}"; do
+                                "$SED" -i"$EXTENSION" -e "$cmd" "$f"
+                            done
+                        fi
+                    done < <("$GIT" ls-files "$1")
 		else
-		    for cmd in "${SED_COMMANDS[@]}"; do
-			"$GIT" ls-files "$1" | "$XARGS" "$SED" -i"$EXTENSION" -e "$cmd"
-		    done
+                    while read -r f; do
+                        if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                            for cmd in "${SED_COMMANDS[@]}"; do
+                                "$SED" -i"$EXTENSION" -e "$cmd" "$f"
+                            done
+                        fi
+                    done < <("$GIT" ls-files -z "$1")
 		fi
 	    fi
 	else
@@ -524,27 +610,43 @@ while [[ "$i" -lt "$GLOBS" ]]; do
 		# the sed options
 
 		# check for -0
-		if [[ -n "$ZERO_FLAG" ]]; then
-		    for cmd in "${SED_COMMANDS[@]}"; do
-			"$GIT" ls-files -z "$1" | "$XARGS" -0 "$SED" "${SED_OPTIONS[*]}" -e "$cmd"
-		    done
+                if [[ -z "$ZERO_FLAG" ]]; then
+                    while read -r f; do
+                        if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                            for cmd in "${SED_COMMANDS[@]}"; do
+                                "$SED" "${SED_OPTIONS[*]}" -e "$cmd" "$f"
+                            done
+                        fi
+                    done < <("$GIT" ls-files "$1")
 		else
-		    for cmd in "${SED_COMMANDS[@]}"; do
-			"$GIT" ls-files "$1" | "$XARGS" "$SED" "${SED_OPTIONS[*]}" -e "$cmd"
-		    done
+                    while read -r f; do
+                        if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                            for cmd in "${SED_COMMANDS[@]}"; do
+                                "$SED" "${SED_OPTIONS[*]}" -e "$cmd" "$f"
+                            done
+                        fi
+                    done < <("$GIT" ls-files -z "$1")
 		fi
 	    else
 		# as no sgit -o was used we just run the sed commands on the files
 
 		# check for -0
-		if [[ -n "$ZERO_FLAG" ]]; then
-		    for cmd in "${SED_COMMANDS[@]}"; do
-			"$GIT" ls-files -z "$1" | "$XARGS" -0 "$SED" -e "$cmd"
-		    done
+		if [[ -z "$ZERO_FLAG" ]]; then
+                    while read -r f; do
+                        if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                            for cmd in "${SED_COMMANDS[@]}"; do
+                                "$SED" -e "$cmd" "$f"
+                            done
+                        fi
+                    done < <("$GIT" ls-files "$1")
 		else
-		    for cmd in "${SED_COMMANDS[@]}"; do
-			"$GIT" ls-files "$1" | "$XARGS" "$SED" -e "$cmd"
-		    done
+                    while read -r f; do
+                        if [[ -f "$f" ]] && [[ ! -L "$f" ]]; then
+                            for cmd in "${SED_COMMANDS[@]}"; do
+                                "$SED" -e "$cmd" "$f"
+                            done
+                        fi
+                    done < <("$GIT" ls-files -z "$1")
 		fi
 	    fi
 	fi

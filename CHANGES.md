@@ -1,3 +1,10 @@
+# Version 1.0.3 06-11-2024
+
+`sgit` no longer acts on symlinks as this causes a type change in git, and if
+someone wants the contents of a symlink in git changed, they can edit the target
+file instead.
+
+
 # Version 1.0.0-8 29-08-2024
 
 Fix bug that showed up if a glob did not find any file in the repo.

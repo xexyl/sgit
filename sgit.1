@@ -10,7 +10,7 @@
 .\" prompting me to write this tool - and above all my dear Mum Dianne and my
 .\" wonderful cousin Dani.
 .\"
-.TH sgit 1 "11 August 2024" "sgit" ""
+.TH sgit 1 "06 November 2024" "sgit" ""
 .SH NAME
 .B sgit
 \- run 
@@ -268,6 +268,9 @@ files but only those under
 control and with certain globs, without having to first extract the paths and passing them all to
 .BR sed (1).
 It was finally written when he was helping the judges of the IOCCC, the International Obfuscated C Code Contest.
+.PP
+.BR sgit (1)
+does not act on symlinks as this has, in my experience, caused a type change; edit the target file, not the symlink.
 .SH BUGS
 .PP
 Cody Boone Ferguson wrote it! :)

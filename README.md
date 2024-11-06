@@ -61,6 +61,9 @@ does not require `-0` to `xargs(1)`. This option has not been tested well and
 has only been added in case someone needs it. The debug output does not quote
 files with spaces or other unsafe characters either.
 
+Note that as of version `1.0.3 06-11-2024` the tool does not act on symlinks as
+this causes a git type change; edit the target of the symlink instead.
+
 See the usage below or run `sgit` by itself (or with the `-h` option) to see the
 rest of the options.
 
@@ -117,7 +120,7 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension]
 				NOTE: this does not check if your xargs has -0
 
 
-sgit version: 1.0.2 02-11-2024
+sgit version: 1.0.3 06-11-2024
 ```
 
 You **MUST** specify at least one `sed` command and if the `-t` option is not
