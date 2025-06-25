@@ -1,3 +1,8 @@
+# Version 1.0.4 25-06-2025
+
+Improve check if one is inside a git repo.
+
+
 # Version 1.0.3 06-11-2024
 
 `sgit` no longer acts on symlinks as this causes a type change in git, and if

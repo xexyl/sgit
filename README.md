@@ -119,8 +119,7 @@ usage: sgit [-h] [-V] [-v level] [-x] [-I] [-i extension]
 
 				NOTE: this does not check if your xargs has -0
 
-
-sgit version: 1.0.3 06-11-2024
+sgit version: 1.0.4 25-06-2025
 ```
 
 You **MUST** specify at least one `sed` command and if the `-t` option is not
